@@ -43,15 +43,21 @@ class MainTest:WordSpec({
             "4nineeightseven2".replaceNumericalText() shouldBe "4n9inee8ights7even2"
         }
 
-        "replacing digits in eightwothree is 49nine8eight7seven2" {
+        "replacing digits in eightwothree is e8ight2wot3hree" {
             "eightwothree".replaceNumericalText() shouldBe "e8ight2wot3hree"
         }
 
+        "replacing digits in eightwo is e8ight2wo" {
+            "eightwo".replaceNumericalText() shouldBe "e8ight2wo"
+        }
         "calculating adjusted calibration value for abcone2threexyz should give 13 " {
             "bcone2threexyz".calculateAdjustedCalibrationValue() shouldBe 13
         }
         "calculating adjusted calibration value for eightwothree should give 83 " {
             "eightwothree".calculateAdjustedCalibrationValue() shouldBe 83
+        }
+        "calculating adjusted calibration value for eightwo should give 82 " {
+            "eightwo".calculateAdjustedCalibrationValue() shouldBe 82
         }
         "calculating adjusted calibration value for test data should give 281" {
             testData2.forEach { println(it.calculateAdjustedCalibrationValue()) }
