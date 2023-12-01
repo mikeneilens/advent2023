@@ -33,6 +33,6 @@ fun String.replaceNumericalText(numberMaps:List<Pair<String, String>> =
                                         "seven" to "s7even",
                                         "eight" to "e8ight",
                                         "nine" to "n9ine")
-):String = numberMaps.fold(this){ result, map -> result.replaceNumericalText(map)  }
+):String = numberMaps.fold(this, ::replaceNumericalText)
 
-fun String.replaceNumericalText(numberMap:Pair<String, String>) = replace(numberMap.first, numberMap.second)
+fun replaceNumericalText(s:String, numberMap:Pair<String, String>) = s.replace(numberMap.first, numberMap.second)
