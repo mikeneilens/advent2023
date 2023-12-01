@@ -11,9 +11,9 @@ fun List<String>.calculateCalibrationValue() = sumOf(String::calculateCalibratio
 
 fun String.calculateCalibrationValue() = firstDigit() * 10 + lastDigit()
 
-fun String.firstDigit() = first{ it.isDigit() }.digitToInt()
+fun String.firstDigit() = first(Char::isDigit).digitToInt()
 
-fun String.lastDigit() = last{ it.isDigit() }.digitToInt()
+fun String.lastDigit() = last(Char::isDigit).digitToInt()
 
 fun partTwo(sampleData:List<String>):Int {
     return sampleData.calculateAdjustedCalibrationValue()
