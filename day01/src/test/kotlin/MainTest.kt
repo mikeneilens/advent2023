@@ -16,11 +16,11 @@ class MainTest:WordSpec({
         "last digit in string ab1c2d3e is 3" {
             "ab1c2d3e".lastDigit() shouldBe  3
         }
-        "calibration value in string ab1c2d3e is 13" {
-            "ab1c2d3e".calibrationValue() shouldBe  13
+        "calculating calibration value in string ab1c2d3e should give 13" {
+            "ab1c2d3e".calculateCalibrationValue() shouldBe  13
         }
-        "calibration value for test data is 142" {
-            testData.calibrationValue() shouldBe  142
+        "calculating calibration value for test data should give 142" {
+            testData.calculateCalibrationValue() shouldBe  142
         }
         "part one should be 53921" {
             partOne(sampleData) shouldBe  53921
@@ -47,15 +47,15 @@ class MainTest:WordSpec({
             "eightwothree".replaceNumericalText() shouldBe "e8ight2wot3hree"
         }
 
-        "adjusted calibration value for abcone2threexyz is 13 " {
-            "bcone2threexyz".adjustedCalibrationValue() shouldBe 13
+        "calculating adjusted calibration value for abcone2threexyz should give 13 " {
+            "bcone2threexyz".calculateAdjustedCalibrationValue() shouldBe 13
         }
-        "adjusted calibration value for eightwothree is 83 " {
-            "eightwothree".adjustedCalibrationValue() shouldBe 83
+        "calculating adjusted calibration value for eightwothree should give 83 " {
+            "eightwothree".calculateAdjustedCalibrationValue() shouldBe 83
         }
-        "adjusted calibration value for test data is 281" {
-            testData2.forEach { println(it.adjustedCalibrationValue()) }
-            testData2.adjustedCalibrationValue() shouldBe  281
+        "calculating adjusted calibration value for test data should give 281" {
+            testData2.forEach { println(it.calculateAdjustedCalibrationValue()) }
+            testData2.calculateAdjustedCalibrationValue() shouldBe  281
         }
 
         "part two should be 54676" {
