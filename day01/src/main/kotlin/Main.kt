@@ -22,7 +22,7 @@ fun List<String>.calculateAdjustedCalibrationValue() = sumOf(String::calculateAd
 
 fun String.calculateAdjustedCalibrationValue() = replaceNumericalText().calculateCalibrationValue()
 
-fun String.replaceNumericalText(numberMap:List<Pair<String, String>> =
+fun String.replaceNumericalText(numberMaps:List<Pair<String, String>> =
                                     listOf("zero" to "z0ero",
                                         "one" to "o1ne",
                                         "two" to "t2wo",
@@ -33,6 +33,6 @@ fun String.replaceNumericalText(numberMap:List<Pair<String, String>> =
                                         "seven" to "s7even",
                                         "eight" to "e8ight",
                                         "nine" to "n9ine")
-):String = numberMap.fold(this){ result, map -> result.replaceNumericalText(map)  }
+):String = numberMaps.fold(this){ result, map -> result.replaceNumericalText(map)  }
 
 fun String.replaceNumericalText(numberMap:Pair<String, String>) = replace(numberMap.first, numberMap.second)
