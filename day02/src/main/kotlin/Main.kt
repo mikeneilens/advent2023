@@ -55,4 +55,4 @@ fun Game.power() =
 inline fun <reified TypeOfCube:CubeType>Game.minimumNoOfCubeType() = sets.maxOf{it.minimumOfCubeType<TypeOfCube>()}
 
 inline fun <reified TypeOfCube:CubeType>List<CubeType>.minimumOfCubeType() =
-    filterIsInstance<TypeOfCube>().maxByOrNull { it.quantity }?.quantity ?: 0
+    filterIsInstance<TypeOfCube>().maxOfOrNull { it.quantity } ?: 0
