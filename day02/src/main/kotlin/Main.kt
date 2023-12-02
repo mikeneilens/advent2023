@@ -25,6 +25,8 @@ data class Game(val gameNo:Int, val sets:List<List<CubeType>>) {
     fun isValid() = sets.all(List<CubeType>::isValid)
 }
 
+fun List<Game>.validGameNumbers() = filter(Game::isValid).map{it.gameNo}
+
 fun partOne(sampleData:List<String>) :Int {
     return sampleData.parse().validGameNumbers().sum()
 }
@@ -39,8 +41,6 @@ fun String.toSets() = split(": ").last().split("; ").map(String::toCubes)
 
 fun String.toCubes():List<CubeType> = split(", ").map(String::toCube)
 
-fun List<Game>.validGameNumbers() = filter(Game::isValid).map{it.gameNo}
-
 fun List<CubeType>.isValid() = all(CubeType::isValid)
 
 fun partTwo(sampleData:List<String>):Int {
@@ -52,7 +52,9 @@ fun List<Game>.power() = map(Game::power)
 fun Game.power() = minimumNoOfReds() * minimumNoOfGreens() * minimumNoOfBlues()
 
 fun Game.minimumNoOfReds() = sets.maxOf{it.minimumOfCubeType<RedCube>()}
+
 fun Game.minimumNoOfGreens() = sets.maxOf{it.minimumOfCubeType<GreenCube>()}
+
 fun Game.minimumNoOfBlues() = sets.maxOf{it.minimumOfCubeType<BlueCube>()}
 
 inline fun <reified TypeOfCube:CubeType>List<CubeType>.minimumOfCubeType() =
