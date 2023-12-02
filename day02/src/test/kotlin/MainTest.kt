@@ -68,9 +68,9 @@ class MainTest:WordSpec({
     })
     "part two" should ({
         "In game 1, the game could have been played with as few as 4 red, 2 green, and 6 blue cubes." {
-            testData.parse().first().minimumNoOfReds() shouldBe 4
-            testData.parse().first().minimumNoOfGreens() shouldBe 2
-            testData.parse().first().minimumNoOfBlues() shouldBe 6
+            testData.parse().first().minimumNoOfCubeType<RedCube>() shouldBe 4
+            testData.parse().first().minimumNoOfCubeType<GreenCube>() shouldBe 2
+            testData.parse().first().minimumNoOfCubeType<BlueCube>() shouldBe 6
         }
         "power of each set of cubes in the test data should be 48, 12, 1560, 630, and 36" {
             testData.parse().power() shouldBe listOf(48, 12, 1560, 630, 36)

@@ -49,13 +49,10 @@ fun partTwo(sampleData:List<String>):Int {
 
 fun List<Game>.power() = map(Game::power)
 
-fun Game.power() = minimumNoOfReds() * minimumNoOfGreens() * minimumNoOfBlues()
+fun Game.power() =
+    minimumNoOfCubeType<RedCube>() * minimumNoOfCubeType<GreenCube>() * minimumNoOfCubeType<BlueCube>()
 
-fun Game.minimumNoOfReds() = sets.maxOf{it.minimumOfCubeType<RedCube>()}
-
-fun Game.minimumNoOfGreens() = sets.maxOf{it.minimumOfCubeType<GreenCube>()}
-
-fun Game.minimumNoOfBlues() = sets.maxOf{it.minimumOfCubeType<BlueCube>()}
+inline fun <reified TypeOfCube:CubeType>Game.minimumNoOfCubeType() = sets.maxOf{it.minimumOfCubeType<TypeOfCube>()}
 
 inline fun <reified TypeOfCube:CubeType>List<CubeType>.minimumOfCubeType() =
     filterIsInstance<TypeOfCube>().maxByOrNull { it.quantity }?.quantity ?: 0
