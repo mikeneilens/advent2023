@@ -51,14 +51,9 @@ fun List<Game>.power() = map(Game::power)
 
 fun Game.power() = minimumNoOfReds() * minimumNoOfGreens() * minimumNoOfBlues()
 
-fun Game.minimumNoOfReds() = sets.maxOf(List<CubeType>::minimumNoOfReds)
+fun Game.minimumNoOfReds() = sets.maxOf{it.minimumOfCubeType<RedCube>()}
+fun Game.minimumNoOfGreens() = sets.maxOf{it.minimumOfCubeType<GreenCube>()}
+fun Game.minimumNoOfBlues() = sets.maxOf{it.minimumOfCubeType<BlueCube>()}
 
-fun Game.minimumNoOfGreens() = sets.maxOf(List<CubeType>::minimumNoOfGreens)
-
-fun Game.minimumNoOfBlues() = sets.maxOf(List<CubeType>::minimumNoOfBlues)
-
-fun List<CubeType>.minimumNoOfReds():Int = filter{it is RedCube}.maxByOrNull { it.quantity }?.quantity ?: 0
-
-fun List<CubeType>.minimumNoOfGreens():Int = filter{it is GreenCube}.maxByOrNull { it.quantity }?.quantity ?: 0
-
-fun List<CubeType>.minimumNoOfBlues():Int = filter{it is BlueCube}.maxByOrNull { it.quantity }?.quantity ?: 0
+inline fun <reified TypeOfCube:CubeType>List<CubeType>.minimumOfCubeType() =
+    filterIsInstance<TypeOfCube>().maxByOrNull { it.quantity }?.quantity ?: 0
