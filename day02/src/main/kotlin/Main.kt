@@ -52,7 +52,7 @@ fun List<Game>.power() = map(Game::power)
 fun Game.power() =
     minimumNoOfCubeType<RedCube>() * minimumNoOfCubeType<GreenCube>() * minimumNoOfCubeType<BlueCube>()
 
-inline fun <reified TypeOfCube:CubeType>Game.minimumNoOfCubeType() = sets.maxOf{it.minimumOfCubeType<TypeOfCube>()}
+inline fun <reified TypeOfCube:CubeType>Game.minimumNoOfCubeType() = sets.flatten().minimumOfCubeType<TypeOfCube>()
 
 inline fun <reified TypeOfCube:CubeType>List<CubeType>.minimumOfCubeType() =
     filterIsInstance<TypeOfCube>().maxOfOrNull { it.quantity } ?: 0
