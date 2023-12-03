@@ -8,7 +8,7 @@ data class NumberChunk(val columnRange:IntRange, val row:Int, val data:List<Stri
     fun adjacentPositions() =
         (columnRange.widenBy(1 )).flatMap{ x ->
             ((row..row).widenBy(1)).map{ y -> Position(y,x) }
-        }.filter {it.isInRange(data) && !it.overlapsNumberChunk(this) }
+        }.filter {position -> position.isInRange(data) && !position.overlapsNumberChunk(this) }
 
     fun extendWidth() = this.copy(columnRange = columnRange.first..(columnRange.last + 1))
 
