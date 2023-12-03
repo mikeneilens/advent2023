@@ -17,7 +17,7 @@ class MainTest:WordSpec({
     """.trimIndent().split("\n")
 
     "part one" should ({
-        "calculate positions adjacent to chunk(startcol=2, endCol=3, row=2) when not at end of row or column" {
+        "calculate positions adjacent to chunk(columnRange=2..3, row=2) when not at end of row or column" {
             val numberChunk = NumberChunk(columnRange = 2..3, row = 2, data = testData)
             val expectedPositions = setOf(
                 Position(1,1),
@@ -33,7 +33,7 @@ class MainTest:WordSpec({
             )
             numberChunk.adjacentPositions().toSet() shouldBe expectedPositions
         }
-        "calculate positions adjacent to chunk(startcol=8, endCol=9, row=2) when is at end of row" {
+        "calculate positions adjacent to chunk(columnRange=8..9, row=2) when is at end of row" {
             val numberChunk = NumberChunk(columnRange = 8..9, row = 2, testData)
             val expectedPositions = setOf(
                 Position(1,7),
@@ -46,7 +46,7 @@ class MainTest:WordSpec({
             )
             numberChunk.adjacentPositions().toSet() shouldBe expectedPositions
         }
-        "calculate positions adjacent to chunk(startcol=2, endCol=3, row=9) when at end of column" {
+        "calculate positions adjacent to chunk(columnRange=2..3, row=9) when at end of column" {
             val numberChunk = NumberChunk(columnRange = 2..3, row = 9, testData)
             val expectedPositions = setOf(
                 Position(8,1),
@@ -58,7 +58,7 @@ class MainTest:WordSpec({
             )
             numberChunk.adjacentPositions().toSet() shouldBe expectedPositions
         }
-        "convert '..592.....' on row 5 to listOf(numberchunk(startcol=2, endCol=4,row=5))" {
+        "convert '..592.....' on row 5 to listOf(numberChunk(columnRange=2..4,row=5))" {
             "..592.....".toNumberChunks(row=5, testData) shouldBe listOf(NumberChunk(2..4,5, testData))
         }
 
@@ -71,7 +71,7 @@ class MainTest:WordSpec({
         "value of numberChunk(startCol = 6, endCol = 8, row = 2) in testData is 633" {
             NumberChunk(columnRange = 6..8, row = 2, testData).value() shouldBe 633
         }
-        "numberChunks adjacent to symbols in the test datat" {
+        "numberChunks adjacent to symbols in the test data" {
             val expectedResult = listOf(
                 NumberChunk(columnRange=0..2, row=0, testData),
                 NumberChunk(columnRange=2..3, row=2, testData),
@@ -91,7 +91,7 @@ class MainTest:WordSpec({
         }
     })
     "part two" should ({
-        "update an astrisk map showing number chunks for each asterisk position in the test data" {
+        "update an asterisk map showing number chunks for each asterisk position in the test data" {
             val asteriskMap = mutableMapOf<Position,List<NumberChunk>>()
             asteriskMap.updateAsteriskMap(testData.toNumberChunks())
 
