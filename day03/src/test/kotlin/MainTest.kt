@@ -91,8 +91,34 @@ class MainTest:WordSpec({
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "update an astrisk map showing number chunks for each asterisk position in the test data" {
+            val asteriskMap = mutableMapOf<Position,List<NumberChunk>>()
+            testData.toNumberChunks().updateAsteriskMap(asteriskMap)
+
+            val asteriskRow1Col3 = asteriskMap[Position(1,3)]
+            asteriskRow1Col3?.size shouldBe 2
+            asteriskRow1Col3?.get(0)?.value() shouldBe 467
+            asteriskRow1Col3?.get(1)?.value() shouldBe 35
+
+            val asteriskRow4Col3 = asteriskMap[Position(4,3)]
+            asteriskRow4Col3?.size shouldBe 1
+            asteriskRow4Col3?.get(0)?.value() shouldBe 617
+
+            val asteriskRow8Col5 = asteriskMap[Position(8,5)]
+            asteriskRow8Col5?.size shouldBe 2
+            asteriskRow8Col5?.get(0)?.value() shouldBe 755
+            asteriskRow8Col5?.get(1)?.value() shouldBe 598
+        }
+        "gear ratios in test data is [16345, 451490]" {
+            val asteriskMap = mutableMapOf<Position,List<NumberChunk>>()
+            testData.toNumberChunks().updateAsteriskMap(asteriskMap)
+            asteriskMap.gearRatios() shouldBe listOf(16345, 451490)
+        }
+        "part two using test data should be 467835" {
+            partTwo(testData) shouldBe 467835
+        }
+        "part two using sample data should be 467835" {
+            partTwo(sampleData) shouldBe 81709807
         }
     })
 })

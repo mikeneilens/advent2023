@@ -13,6 +13,8 @@ data class NumberChunk(val startCol:Int, var endCol:Int, val row:Int, val data:L
     fun value() = data[row].substring(startCol..endCol).toInt()
 
     fun isAdjacentToSymbol() = adjacentPositions().any { it.containsSymbol(data) }
+
+    fun adjacentPositionsContainingAsterisk() = adjacentPositions().filter {data[it.row][it.col] == '*'}
 }
 
 data class Position(val row:Int, val col:Int) {
@@ -51,5 +53,23 @@ fun String.toNumberChunks(row:Int, data:List<String>) =
 fun List<NumberChunk>.adjacentToSymbols() = filter{it.isAdjacentToSymbol() }
 
 fun partTwo(sampleData:List<String>):Int {
-    return 0
+    val asteriskMap = mutableMapOf<Position,List<NumberChunk>>()
+    sampleData.toNumberChunks().updateAsteriskMap(asteriskMap)
+    return asteriskMap.gearRatios().sum()
 }
+
+fun List<NumberChunk>.updateAsteriskMap(map:MutableMap<Position, List<NumberChunk>>) {
+    forEach { numberChunk ->
+        numberChunk.adjacentPositionsContainingAsterisk().forEach {position ->
+            val currentNumberChunks = map[position] ?: listOf()
+            map[position] = currentNumberChunks + numberChunk
+        }
+    }
+}
+
+fun Map<Position, List<NumberChunk>>.gearRatios() =
+    toList().mapNotNull{ (position, numberChunks) ->
+        if (numberChunks.size == 2)
+            numberChunks.fold(1){a,v -> a * v.value()}
+            else null
+    }
