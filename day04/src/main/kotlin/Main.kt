@@ -22,9 +22,9 @@ fun List<Int>.valueOfWinningNumbers() = if (size > 0) 2.0.pow(size - 1).toInt() 
 fun String.scoreForGame() = yourNumbersThatWin(toWinningNumbers(), toYourNumbers()).valueOfWinningNumbers()
 
 fun partTwo(sampleData:List<String>):Int {
-    val winnersForEachCard = sampleData.map { yourNumbersThatWin(it.toWinningNumbers(), it.toYourNumbers())}
-    val gameNodes = winnersForEachCard.createGameNodes()
-    return gameNodes.sumOf{it.noOfCards()}
+    return sampleData.map { yourNumbersThatWin(it.toWinningNumbers(), it.toYourNumbers())}
+        .createGameNodes()
+        .sumOf{it.noOfCards()}
 }
 
 data class Game(val gameNode:GameNode, val indexOfSubsequentGameNumbers:List<Int>)
