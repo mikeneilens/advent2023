@@ -39,8 +39,34 @@ class MainTest:WordSpec({
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "game node with one child node that has no children is two" {
+            val gameNode2 = GameNode(2, listOf())
+            val gameNode1 = GameNode(1, listOf(gameNode2))
+            gameNode1.noOfCards() shouldBe 2
+        }
+        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 has subsequent games of [2,3,4,5]" {
+            val card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
+            yourNumbersThatWin(card.toWinningNumbers(), card.toYourNumbers())
+                .subsequentGameNumbers(1) shouldBe listOf(2,3,4,5)
+        }
+        "create listOf gameNodes for testData " {
+            val winnersForEachCard = testData.map { yourNumbersThatWin(it.toWinningNumbers(), it.toYourNumbers())}
+            val gameNodes = winnersForEachCard.createGameNodes()
+            gameNodes.size shouldBe 6
+            gameNodes[0].gameNo shouldBe 1
+            gameNodes[0].subsequentGames.size shouldBe 4
+            gameNodes[0].subsequentGames[0].gameNo shouldBe 2
+            gameNodes[0].subsequentGames[1].gameNo shouldBe 3
+            gameNodes[0].subsequentGames[2].gameNo shouldBe 4
+            gameNodes[0].subsequentGames[3].gameNo shouldBe 5
+            gameNodes[5].gameNo shouldBe 6
+            gameNodes[5].subsequentGames.size shouldBe 0
+        }
+        "part two with testData should be 30" {
+            partTwo(testData) shouldBe 30
+        }
+        "part two with sampleData should be 7185540" {
+            partTwo(sampleData) shouldBe 7185540
         }
     })
 })
