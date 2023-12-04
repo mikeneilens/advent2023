@@ -1,6 +1,6 @@
 import kotlin.math.pow
 
-fun main(args: Array<String>) {
+fun main() {
     partOne(sampleData)
     partTwo(sampleData)
 }
@@ -17,7 +17,7 @@ fun String.yourNumbersString()= split(": ").last().split(" | ").last().replace("
 
 fun yourNumbersThatWin(winningNumbers:List<Int>, yourNumbers:List<Int>) = yourNumbers.filter{it in winningNumbers}
 
-fun List<Int>.valueOfWinningNumbers() = if (size > 0) 2.0.pow(size - 1).toInt() else 0
+fun List<Int>.valueOfWinningNumbers() = if (isNotEmpty()) 2.0.pow(size - 1).toInt() else 0
 
 fun String.scoreForGame() = yourNumbersThatWin(toWinningNumbers(), toYourNumbers()).valueOfWinningNumbers()
 
@@ -27,17 +27,25 @@ fun partTwo(sampleData:List<String>):Int {
         .sumOf{it.noOfCards()}
 }
 
-data class Game(val gameNode:GameNode, val indexOfSubsequentGameNumbers:List<Int>)
+data class Game(val gameNode:GameNode, val indicesOfSubsequentGameNumbers:List<Int>) {
 
-class GameNode(val gameNo:Int, var subsequentGameNodes:List<GameNode> ) {
+    fun updateSubsequentGameNodes(games:List<Game>) {
+        gameNode.subsequentGameNodes = indicesOfSubsequentGameNumbers.map { index -> games[index].gameNode}
+    }
+}
+
+class GameNode(val gameNo:Int, var subsequentGameNodes:List<GameNode> = emptyList() ) {
     fun noOfCards():Int = 1 + subsequentGameNodes.sumOf { it.noOfCards() }
 }
 
 fun List<List<Int>>.createGameNodes():List<GameNode> {
-    val games = mapIndexed { i, winningNumbers ->
-        Game(GameNode(i + 1, listOf()), winningNumbers.subsequentGameNumbers(i + 1) ) }
-    games.forEach {game -> game.gameNode.subsequentGameNodes = game.indexOfSubsequentGameNumbers.map { index -> games[index].gameNode}}
+    val games = createListOfGames()
+    games.forEach {game -> game.updateSubsequentGameNodes(games) }
     return games.map{it.gameNode}
 }
 
-fun List<Int>.subsequentGameNumbers(gameNo:Int) = if ( isEmpty()) listOf() else ((gameNo)..(gameNo + size - 1)).toList()
+fun List<List<Int>>.createListOfGames() =
+    mapIndexed { i, winningNumbers -> Game(GameNode(i + 1), winningNumbers.indicesOfSubsequentGameNumbers(i + 1) ) }
+
+fun List<Int>.indicesOfSubsequentGameNumbers(gameNo:Int) = if ( isEmpty()) listOf() else ((gameNo) until gameNo + size).toList()
+

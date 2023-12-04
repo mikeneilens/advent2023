@@ -47,7 +47,7 @@ class MainTest:WordSpec({
         "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 has subsequent games with index of [1,2,3,4]" {
             val card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
             yourNumbersThatWin(card.toWinningNumbers(), card.toYourNumbers())
-                .subsequentGameNumbers(1) shouldBe listOf(1,2,3,4)
+                .indicesOfSubsequentGameNumbers(1) shouldBe listOf(1,2,3,4)
         }
         "create listOf gameNodes for testData " {
             val winnersForEachCard = testData.map { yourNumbersThatWin(it.toWinningNumbers(), it.toYourNumbers())}
