@@ -40,8 +40,7 @@ class GameNode(val gameNo:Int, var subsequentGameNodes:List<GameNode> = emptyLis
 
 fun List<List<Int>>.createGameNodes():List<GameNode> {
     val games = createListOfGames()
-    games.forEach {game -> game.updateSubsequentGameNodes(games) }
-    return games.map{it.gameNode}
+    return games.map {game -> game.apply{updateSubsequentGameNodes(games)}.gameNode }
 }
 
 fun List<List<Int>>.createListOfGames() =
