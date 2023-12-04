@@ -44,23 +44,23 @@ class MainTest:WordSpec({
             val gameNode1 = GameNode(1, listOf(gameNode2))
             gameNode1.noOfCards() shouldBe 2
         }
-        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 has subsequent games of [2,3,4,5]" {
+        "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53 has subsequent games with index of [1,2,3,4]" {
             val card = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53"
             yourNumbersThatWin(card.toWinningNumbers(), card.toYourNumbers())
-                .subsequentGameNumbers(1) shouldBe listOf(2,3,4,5)
+                .subsequentGameNumbers(1) shouldBe listOf(1,2,3,4)
         }
         "create listOf gameNodes for testData " {
             val winnersForEachCard = testData.map { yourNumbersThatWin(it.toWinningNumbers(), it.toYourNumbers())}
             val gameNodes = winnersForEachCard.createGameNodes()
             gameNodes.size shouldBe 6
             gameNodes[0].gameNo shouldBe 1
-            gameNodes[0].subsequentGames.size shouldBe 4
-            gameNodes[0].subsequentGames[0].gameNo shouldBe 2
-            gameNodes[0].subsequentGames[1].gameNo shouldBe 3
-            gameNodes[0].subsequentGames[2].gameNo shouldBe 4
-            gameNodes[0].subsequentGames[3].gameNo shouldBe 5
+            gameNodes[0].subsequentGameNodes.size shouldBe 4
+            gameNodes[0].subsequentGameNodes[0].gameNo shouldBe 2
+            gameNodes[0].subsequentGameNodes[1].gameNo shouldBe 3
+            gameNodes[0].subsequentGameNodes[2].gameNo shouldBe 4
+            gameNodes[0].subsequentGameNodes[3].gameNo shouldBe 5
             gameNodes[5].gameNo shouldBe 6
-            gameNodes[5].subsequentGames.size shouldBe 0
+            gameNodes[5].subsequentGameNodes.size shouldBe 0
         }
         "part two with testData should be 30" {
             partTwo(testData) shouldBe 30
