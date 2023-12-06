@@ -10,16 +10,13 @@ fun String.toValues() = fold(""){result, char ->
 }.split(" ").drop(2).map{it.trim().toLong()}
 
 data class TimeDistance(val time:Long, val distance:Long) {
-    fun winners() = (0..time).filter{timeButtonPressed ->  timeButtonPressed * (time - timeButtonPressed) > distance}
+    fun distanceTravelled(timeButtonPressed:Long) = timeButtonPressed * (time - timeButtonPressed)
 
-    fun indexOfFirstWinner() = (0..time).indexOfFirst{timeButtonPressed ->  timeButtonPressed * (time - timeButtonPressed) > distance}.toLong()
+    fun winners() = (0..time).filter{timeButtonPressed ->  distanceTravelled(timeButtonPressed) > distance}
 
-    fun numberOfWinners():Long {
-        val start = indexOfFirstWinner()
-        var timeButtonPressed = start
-        while (timeButtonPressed * (time-timeButtonPressed) > distance) { timeButtonPressed++ }
-        return timeButtonPressed - start
-    }
+    fun indexOfFirstWinner() = (0..time).indexOfFirst{distanceTravelled(it) > distance}.toLong()
+
+    fun numberOfWinners() = (indexOfFirstWinner()..time).countWhile{ distanceTravelled(it) > distance }
 }
 
 fun List<String>.toTimeDistance() = first().toValues().zip(last().toValues()).map{ TimeDistance(it.first, it.second)}
@@ -37,3 +34,14 @@ fun String.toValue() = fold(""){result, char ->
         result + ' '
     else if (char != ' ') result + char else result
 }.split(" ").drop(2).joinToString("").trim().toLong()
+
+//helper function to count until the predicate is false
+inline fun <T> Iterable<T>.countWhile(predicate: (T) -> Boolean): Long {
+    var s = 0L
+    for (item in this) {
+        if (!predicate(item))
+            break
+        s ++
+    }
+    return s
+}

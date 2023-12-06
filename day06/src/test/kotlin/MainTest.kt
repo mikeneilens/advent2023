@@ -33,6 +33,9 @@ class MainTest:WordSpec({
         "Distance:  9  40  200 as a single time is 940200" {
             "Distance:  9  40  200".toValue() shouldBe 940200L
         }
+        "count while 2..7 is < 5 is 3 " {
+            (2..7).countWhile{ it < 5 } shouldBe 3
+        }
         "part two with testdata should be 71503" {
             partTwo(testData) shouldBe 71503
         }
