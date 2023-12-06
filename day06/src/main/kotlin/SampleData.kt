@@ -1,11 +1,4 @@
-fun main(args: Array<String>) {
-    partOne(sampleData)
-    partTwo(sampleData)
-}
-
-fun partOne(sampleData:String) :Int {
-    return 0
-}
-fun partTwo(sampleData:String):Int {
-    return 0
-}
+val sampleData = """
+    Time:        38     67     76     73
+    Distance:   234   1027   1157   1236
+""".trimIndent().split("\n")
