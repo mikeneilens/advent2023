@@ -27,8 +27,17 @@ class MainTest:WordSpec({
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "Time:      7  15   30 as a single time is 71530" {
+            "Time:      7  15   30".toValue() shouldBe 71530L
+        }
+        "Distance:  9  40  200 as a single time is 940200" {
+            "Distance:  9  40  200".toValue() shouldBe 940200L
+        }
+        "part two with testdata should be 71503" {
+            partTwo(testData) shouldBe 71503
+        }
+        "part two with sample data should be 23654842" {
+            partTwo(sampleData) shouldBe 23654842
         }
     })
 })
