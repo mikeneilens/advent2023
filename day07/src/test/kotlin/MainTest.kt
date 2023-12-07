@@ -99,7 +99,7 @@ class MainTest:WordSpec({
             testData.toHandsP2().winnings() shouldBe 5905
         }
 
-        "part two should be 0" {
+        "part two should be248747492" {
             partTwo(sampleData) shouldBe 248747492
         }
     })
