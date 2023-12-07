@@ -32,10 +32,10 @@ data class Hand(val cards:String, val bid:Int = 0, val cardValues:Map<Char, Int>
         listOf(5) -> HandType.FiveOfAKind
         listOf(1,4) -> if(cards.contains('*')) HandType.FiveOfAKind else HandType.FourOfAKind
         listOf(2,3) -> if(cards.contains('*')) HandType.FiveOfAKind else HandType.FullHouse
-        listOf(1,1,3) -> if(cards.quantityOf('*') == 1  || cards.filter{it == '*'}.length == 3) HandType.FourOfAKind else HandType.ThreeOfAKind
+        listOf(1,1,3) -> if(cards.contains('*')) HandType.FourOfAKind else HandType.ThreeOfAKind
         listOf(1,2,2) -> if(cards.quantityOf('*') == 2) HandType.FourOfAKind else if(cards.quantityOf('*') == 1) HandType.FullHouse else HandType.TwoPair
-        listOf(1,1,1,2) -> if(cards.quantityOf('*') in 1..2) HandType.ThreeOfAKind else HandType.OnePair
-        else -> if(cards.quantityOf('*') == 1) HandType.OnePair else HandType.HighCard
+        listOf(1,1,1,2) -> if(cards.contains('*')) HandType.ThreeOfAKind else HandType.OnePair
+        else -> if(cards.contains('*')) HandType.OnePair else HandType.HighCard
     }
 }
 
