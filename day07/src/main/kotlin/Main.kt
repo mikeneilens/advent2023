@@ -30,7 +30,7 @@ data class Hand(val cards:String, val bid:Int = 0) {
 
     fun handType() = when(noOfDistinctCards) {
         listOf(5) -> HandType.FiveOfAKind
-        listOf(1,4) -> HandType.FourOfAKind.promoteIf(hasAnyWildCards)// HandType.FiveOfAKind else HandType.FourOfAKind
+        listOf(1,4) -> HandType.FourOfAKind.promoteIf(hasAnyWildCards)
         listOf(2,3) -> HandType.FullHouse.promoteIf(hasAnyWildCards)
         listOf(1,1,3) -> HandType.ThreeOfAKind.promoteIf(hasAnyWildCards)
         listOf(1,2,2) -> if(hasTwoWildCards) HandType.FourOfAKind else HandType.TwoPair.promoteIf(hasAnyWildCards)
