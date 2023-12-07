@@ -24,12 +24,9 @@ data class Hand(val cards:String, val bid:Int = 0) {
 
     fun cardsScore() = cards.reversed().mapIndexed{n, c -> 14.0.pow(n) * cardValues.getValue(c)}.sum()
 
-    fun toMappedCards(map:MutableMap<Char, Int> = mutableMapOf()):Map<Char, Int> {
-        cards.forEach{c -> map[c] = (map[c] ?: 0) + 1}
-        return map
-    }
+    val noOfDistinctCards = cardValues.keys.map{ cardSymbol -> cards.count { it == cardSymbol }}.filter { it != 0 }.sorted()
 
-    fun handType() = when(toMappedCards().values.sorted()) {
+    fun handType() = when(noOfDistinctCards) {
         listOf(5) -> HandType.FiveOfAKind
         listOf(1,4) -> if(hasAnyWildCards) HandType.FiveOfAKind else HandType.FourOfAKind
         listOf(2,3) -> if(hasAnyWildCards) HandType.FiveOfAKind else HandType.FullHouse
@@ -39,14 +36,14 @@ data class Hand(val cards:String, val bid:Int = 0) {
         else -> if(hasAnyWildCards) HandType.OnePair else HandType.HighCard
     }
 
-    val hasAnyWildCards get() = cards.contains('*')
+    val hasAnyWildCards = cards.contains('*')
 
-    val hasTwoWildCards get() = cards.filter { it == '*' }.length == 2
+    val hasTwoWildCards = cards.filter { it == '*' }.length == 2
 }
 
 fun List<String>.toHands() = map{Hand(it.split(" ")[0], it.split(" ")[1].toInt())}
 
-fun List<Hand>.winnings() = sortedBy { it.totalScore() }.mapIndexed {i,c -> Pair((i + 1), c) }.sumOf { it.first * it.second.bid }
+fun List<Hand>.winnings() = sortedBy { it.totalScore() }.foldIndexed(0){i, total, hand -> total + (i + 1) * hand.bid }
 
 fun partOne(sampleData:List<String>) :Int {
     return sampleData.toHands().winnings()

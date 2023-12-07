@@ -19,6 +19,9 @@ class MainTest:WordSpec({
         "cardsScore of cards 43 is 44" {
             Hand("43").cardsScore() shouldBe 44.0
         }
+        "number of each kind of card in 13331 is listOf(2,3)" {
+            Hand("43334").noOfDistinctCards shouldBe listOf(2,3)
+        }
         "AAAAA is five of a kind" {
             Hand("AAAAA").handType() shouldBe HandType.FiveOfAKind
         }
