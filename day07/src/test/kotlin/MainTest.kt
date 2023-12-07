@@ -93,7 +93,7 @@ class MainTest:WordSpec({
             (hands[0].totalScore() > hands[1].totalScore()) shouldBe true
         }
         "testData winnings is 5905" {
-            testData.toHandsP2().winningsP2() shouldBe 5905
+            testData.toHandsP2().winnings() shouldBe 5905
         }
 
         "part two should be 0" {
