@@ -23,25 +23,25 @@ class MainTest:WordSpec({
             Hand("43334").noOfDistinctCards shouldBe listOf(2,3)
         }
         "AAAAA is five of a kind" {
-            Hand("AAAAA").handType() shouldBe HandType.FiveOfAKind
+            HandType.fromHand(Hand("AAAAA")) shouldBe HandType.FiveOfAKind
         }
         "AA8AA is four of a kind" {
-            Hand("AA8AA").handType() shouldBe HandType.FourOfAKind
+            HandType.fromHand(Hand("AA8AA")) shouldBe HandType.FourOfAKind
         }
         "23332 is full house" {
-            Hand("23332").handType() shouldBe HandType.FullHouse
+            HandType.fromHand(Hand("23332")) shouldBe HandType.FullHouse
         }
         "TTT98 is three of a kind" {
-            Hand("TTT98").handType() shouldBe HandType.ThreeOfAKind
+            HandType.fromHand(Hand("TTT98")) shouldBe HandType.ThreeOfAKind
         }
         "23432 is two pair" {
-            Hand("23432").handType() shouldBe HandType.TwoPair
+            HandType.fromHand(Hand("23432")) shouldBe HandType.TwoPair
         }
         "A23A4 is one pair" {
-            Hand("A23A4").handType() shouldBe HandType.OnePair
+            HandType.fromHand(Hand("A23A4")) shouldBe HandType.OnePair
         }
         "23456 is High card" {
-            Hand("23456").handType() shouldBe HandType.HighCard
+            HandType.fromHand(Hand("23456")) shouldBe HandType.HighCard
         }
         "testData winnings is 6440" {
             testData.toHands().winnings() shouldBe 6440
@@ -52,40 +52,40 @@ class MainTest:WordSpec({
     })
     "part two" should ({
         "QQQQ* handtype is five of a kind" {
-           Hand("QQQQ*").handType() shouldBe HandType.FiveOfAKind
+            HandType.fromHand(Hand("QQQQ*")) shouldBe HandType.FiveOfAKind
         }
         "QQQQ2 handtype is four of a kind" {
-           Hand("QQQQ2").handType() shouldBe HandType.FourOfAKind
+            HandType.fromHand(Hand("QQQQ2")) shouldBe HandType.FourOfAKind
         }
         "best hand type for 1234* is one pair" {
-            Hand("1234*").handType() shouldBe HandType.OnePair
+            HandType.fromHand(Hand("1234*")) shouldBe HandType.OnePair
         }
         "best hand type for *234* is three of a kind" {
-            Hand("*234*").handType() shouldBe HandType.ThreeOfAKind
+            HandType.fromHand(Hand("*234*")) shouldBe HandType.ThreeOfAKind
         }
         "best hand type for 2234* is three of a kind" {
-            Hand("2234*").handType() shouldBe HandType.ThreeOfAKind
+            HandType.fromHand(Hand("2234*")) shouldBe HandType.ThreeOfAKind
         }
         "best hand type for 2233* is full house" {
-            Hand("2233*").handType() shouldBe HandType.FullHouse
+            HandType.fromHand(Hand("2233*")) shouldBe HandType.FullHouse
         }
         "best hand type for 22**4 is four of a kind" {
-            Hand("22**4").handType() shouldBe HandType.FourOfAKind
+            HandType.fromHand(Hand("22**4")) shouldBe HandType.FourOfAKind
         }
         "best hand type for ***23 is four of a kind" {
-            Hand("***23").handType() shouldBe HandType.FourOfAKind
+            HandType.fromHand(Hand("***23")) shouldBe HandType.FourOfAKind
         }
         "best hand type for T55*5 is four of a kind" {
-            Hand("T55*5").handType() shouldBe HandType.FourOfAKind
+            HandType.fromHand(Hand("T55*5")) shouldBe HandType.FourOfAKind
         }
         "best hand type for 22**2 is five of a kind" {
-            Hand("22**2").handType() shouldBe HandType.FiveOfAKind
+            HandType.fromHand(Hand("22**2")) shouldBe HandType.FiveOfAKind
         }
         "best hand type for 2222* is five of a kind" {
-            Hand("2222*").handType() shouldBe HandType.FiveOfAKind
+            HandType.fromHand(Hand("2222*")) shouldBe HandType.FiveOfAKind
         }
         "best hand type for ****2 is five of a kind" {
-            Hand("****2").handType() shouldBe HandType.FiveOfAKind
+            HandType.fromHand(Hand("****2")) shouldBe HandType.FiveOfAKind
         }
         "*KKK2 is weaker than QQQQ2" {
             val hands = listOf("*KKK2 123", "QQQQ2 123").toHandsP2()

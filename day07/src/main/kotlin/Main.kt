@@ -18,29 +18,37 @@ enum class HandType(val value:Double, val typeWithWildCard:HandType?) {
     HighCard(0.0, OnePair);
 
     fun promoteIf(hasWildCard:Boolean) = if (hasWildCard) this.typeWithWildCard else this
+
+    companion object {
+        fun fromHand(hand:HandForGame) = when(hand.noOfDistinctCards) {
+            listOf(5) -> FiveOfAKind
+            listOf(1,4) -> FourOfAKind.promoteIf(hand.hasAnyWildCards)
+            listOf(2,3) -> FullHouse.promoteIf(hand.hasAnyWildCards)
+            listOf(1,1,3) -> ThreeOfAKind.promoteIf(hand.hasAnyWildCards)
+            listOf(1,2,2) -> if(hand.hasTwoWildCards) FourOfAKind else TwoPair.promoteIf(hand.hasAnyWildCards)
+            listOf(1,1,1,2) -> OnePair.promoteIf(hand.hasAnyWildCards)
+            else ->  HighCard.promoteIf(hand.hasAnyWildCards)
+        }
+    }
 }
 
-data class Hand(val cards:String, val bid:Int = 0) {
+interface HandForGame {
+    val noOfDistinctCards:List<Int>
+    val hasAnyWildCards:Boolean
+    val hasTwoWildCards:Boolean
+}
 
-    fun totalScore() = (handType()?.value ?: 0.0) + cardsScore()
+data class Hand(val cards:String, val bid:Int = 0):HandForGame {
+
+    fun totalScore() = (HandType.fromHand(this)?.value ?: 0.0) + cardsScore()
 
     fun cardsScore() = cards.reversed().mapIndexed{n, c -> 14.0.pow(n) * cardValues.getValue(c)}.sum()
 
-    val noOfDistinctCards = cardValues.keys.map{ cardSymbol -> cards.count { it == cardSymbol }}.filter { it != 0 }.sorted()
+    override val noOfDistinctCards = cardValues.keys.map{ cardSymbol -> cards.count { it == cardSymbol }}.filter { it != 0 }.sorted()
 
-    fun handType() = when(noOfDistinctCards) {
-        listOf(5) -> HandType.FiveOfAKind
-        listOf(1,4) -> HandType.FourOfAKind.promoteIf(hasAnyWildCards)
-        listOf(2,3) -> HandType.FullHouse.promoteIf(hasAnyWildCards)
-        listOf(1,1,3) -> HandType.ThreeOfAKind.promoteIf(hasAnyWildCards)
-        listOf(1,2,2) -> if(hasTwoWildCards) HandType.FourOfAKind else HandType.TwoPair.promoteIf(hasAnyWildCards)
-        listOf(1,1,1,2) -> HandType.OnePair.promoteIf(hasAnyWildCards)
-        else ->  HandType.HighCard.promoteIf(hasAnyWildCards)
-    }
+    override val hasAnyWildCards = cards.contains('*')
 
-    val hasAnyWildCards = cards.contains('*')
-
-    val hasTwoWildCards = cards.filter { it == '*' }.length == 2
+    override val hasTwoWildCards = cards.filter { it == '*' }.length == 2
 }
 
 fun List<String>.toHands() = map{Hand(it.split(" ")[0], it.split(" ")[1].toInt())}
