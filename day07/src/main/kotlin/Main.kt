@@ -30,13 +30,17 @@ data class Hand(val cards:String, val bid:Int = 0, val cardValues:Map<Char, Int>
 
     fun handType() = when(toMappedCards().values.sorted()) {
         listOf(5) -> HandType.FiveOfAKind
-        listOf(1,4) -> if(cards.contains('*')) HandType.FiveOfAKind else HandType.FourOfAKind
-        listOf(2,3) -> if(cards.contains('*')) HandType.FiveOfAKind else HandType.FullHouse
-        listOf(1,1,3) -> if(cards.contains('*')) HandType.FourOfAKind else HandType.ThreeOfAKind
-        listOf(1,2,2) -> if(cards.quantityOf('*') == 2) HandType.FourOfAKind else if(cards.quantityOf('*') == 1) HandType.FullHouse else HandType.TwoPair
-        listOf(1,1,1,2) -> if(cards.contains('*')) HandType.ThreeOfAKind else HandType.OnePair
-        else -> if(cards.contains('*')) HandType.OnePair else HandType.HighCard
+        listOf(1,4) -> if(hasAnyWildCards()) HandType.FiveOfAKind else HandType.FourOfAKind
+        listOf(2,3) -> if(hasAnyWildCards()) HandType.FiveOfAKind else HandType.FullHouse
+        listOf(1,1,3) -> if(hasAnyWildCards()) HandType.FourOfAKind else HandType.ThreeOfAKind
+        listOf(1,2,2) -> if(hasTwoWildCards()) HandType.FourOfAKind else if(hasAnyWildCards()) HandType.FullHouse else HandType.TwoPair
+        listOf(1,1,1,2) -> if (hasAnyWildCards()) HandType.ThreeOfAKind else HandType.OnePair
+        else -> if(hasAnyWildCards()) HandType.OnePair else HandType.HighCard
     }
+
+    fun hasAnyWildCards() = cards.contains('*')
+
+    fun hasTwoWildCards() = cards.filter{it == '*'}.length == 2
 }
 
 fun List<String>.toHands() = map{Hand(it.split(" ")[0], it.split(" ")[1].toInt())}
@@ -55,5 +59,3 @@ fun List<Hand>.winningsP2() = sortedBy { it.totalScore() }.mapIndexed { i, c -> 
 
 fun List<String>.toHandsP2() =
     map{Hand(it.split(" ")[0].replace('J','*'), it.split(" ")[1].toInt())}
-
-fun String.quantityOf(c:Char) = filter{it == c}.length
