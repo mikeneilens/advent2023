@@ -17,18 +17,19 @@ enum class HandType(val value:Double, val typeWithWildCard:HandType?) {
     OnePair(14.0.pow(5), ThreeOfAKind),
     HighCard(0.0, OnePair);
 
-    fun promoteIfAnyWildCards(noOfWildCards:Int) = if (noOfWildCards > 0) this.typeWithWildCard else this
+    fun promoteIfAnyWildCards(noOfWildCards:Int) = if (noOfWildCards > 0) this.typeWithWildCard ?: this else this
 
     companion object {
-        fun fromHand(hand:HandForGame) = when(hand.noOfDistinctCards) {
-            listOf(5) -> FiveOfAKind
-            listOf(1,4) -> FourOfAKind.promoteIfAnyWildCards(hand.noOfWildCards)
-            listOf(2,3) -> FullHouse.promoteIfAnyWildCards(hand.noOfWildCards)
-            listOf(1,1,3) -> ThreeOfAKind.promoteIfAnyWildCards(hand.noOfWildCards)
-            listOf(1,2,2) -> if(hand.noOfWildCards == 2 ) FourOfAKind else TwoPair.promoteIfAnyWildCards(hand.noOfWildCards)
-            listOf(1,1,1,2) -> OnePair.promoteIfAnyWildCards(hand.noOfWildCards)
-            else ->  HighCard.promoteIfAnyWildCards(hand.noOfWildCards)
-        }
+        val map = mapOf(
+            listOf(5) to {_:Int -> FiveOfAKind},
+            listOf(1,4) to {noOfWildCards:Int -> FourOfAKind.promoteIfAnyWildCards(noOfWildCards)},
+            listOf(2,3) to {noOfWildCards:Int -> FullHouse.promoteIfAnyWildCards(noOfWildCards)},
+            listOf(1,1,3) to {noOfWildCards:Int -> ThreeOfAKind.promoteIfAnyWildCards(noOfWildCards)},
+            listOf(1,2,2) to {noOfWildCards:Int -> if(noOfWildCards == 2 ) FourOfAKind else TwoPair.promoteIfAnyWildCards(noOfWildCards)},
+            listOf(1,1,1,2) to {noOfWildCards:Int -> OnePair.promoteIfAnyWildCards(noOfWildCards)},
+            listOf(1,1,1,1,1) to {noOfWildCards:Int -> HighCard.promoteIfAnyWildCards(noOfWildCards)}
+        )
+        fun fromHand(hand:HandForGame) = map.getValue(hand.noOfDistinctCards)(hand.noOfWildCards)
     }
 }
 
@@ -39,11 +40,11 @@ interface HandForGame {
 
 data class Hand(val cards:String, val bid:Int = 0):HandForGame {
 
-    fun totalScore() = (HandType.fromHand(this)?.value ?: 0.0) + cardsScore()
+    fun totalScore() = HandType.fromHand(this).value + cardsScore()
 
     fun cardsScore() = cards.reversed().mapIndexed{n, c -> 14.0.pow(n) * cardValues.getValue(c)}.sum()
 
-    override val noOfDistinctCards = cardValues.keys.map{ cardSymbol -> cards.count { it == cardSymbol }}.filter { it != 0 }.sorted()
+    override val noOfDistinctCards = cards.toList().distinct().map{ cardSymbol -> cards.count { it == cardSymbol }}.filter { it != 0 }.sorted()
 
     override val noOfWildCards = cards.filter { it == '*' }.length
 }
