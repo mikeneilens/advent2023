@@ -1,7 +1,3 @@
-
-import java.util.*
-
-
 fun main() {
     partOne(sampleData)
     partTwo(sampleData)
@@ -37,8 +33,12 @@ fun List<String>.toNodes(nodes:MutableMap<String, Map<Direction, String>> = muta
 fun partOne(sampleData:List<String>) :Int {
     val instructions = sampleData.toInstructions()
     val nodes = sampleData.toNodes()
-    var key = "AAA"
-    while (key != "ZZZ") {
+    return countToTarget(nodes, instructions, "AAA",{it == "ZZZ"})
+}
+
+fun countToTarget(nodes: Nodes, instructions: Instructions, startKey:String, target:(String)->Boolean): Int {
+    var key = startKey
+    while (!target(key)) {
         key = nodes.get(key, instructions.nextStep())
     }
     return instructions.count
@@ -46,25 +46,16 @@ fun partOne(sampleData:List<String>) :Int {
 
 fun partTwo(sampleData:List<String>):Long {
     val nodes = sampleData.toNodes()
-    val nodesEndingInA= nodes.keys.filter{it.endsWith('A')}
-    val instructions = nodesEndingInA.map{sampleData.toInstructions()}
-    var keys = nodesEndingInA.toMutableList()
-    val factors = keys.mapIndexed { i, startKey ->
-        var key = startKey
-        while (!key.endsWith('Z')) {
-            key = nodes.get(key, instructions[i].nextStep())
-        }
-        instructions[i].count.toLong()
+    val factors = nodes.keys.filter{it.endsWith('A')}.map { startKey ->
+        val instructions = sampleData.toInstructions()
+        countToTarget(nodes, instructions, startKey, {it.endsWith('Z')}).toLong()
     }
-    return lcm(factors)
+    return lowestCommonMultiple(factors)
 }
 
-private fun gcd(x: Long, y: Long): Long {
-    return if (y == 0L) x else gcd(y, x % y)
-}
 
-fun lcm(numbers: List<Long>): Long {
-    return numbers.fold(
-        1L
-    ) { x, y -> x * (y / gcd(x, y)) }
-}
+fun lowestCommonMultiple(numbers: List<Long>): Long =
+    numbers.fold(1L) { x, y -> x * (y / greatestCommonDenominator(x, y)) }
+
+fun greatestCommonDenominator(x: Long, y: Long):Long =
+    if (y == 0L) x else greatestCommonDenominator(y, x % y)
