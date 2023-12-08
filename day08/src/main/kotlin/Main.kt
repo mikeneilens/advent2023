@@ -39,16 +39,15 @@ fun countToTarget(nodes: Nodes, instructions: Instructions, startKey:String, tar
 
 fun partTwo(sampleData:List<String>):Long {
     val nodes = sampleData.toNodes()
-    val factors = nodes.keys.filter{it.endsWith('A')}.map { startKey ->
+    return nodes.keys.filter{it.endsWith('A')}.map { startKey ->
         val instructions = sampleData.toInstructions()
         countToTarget(nodes, instructions, startKey) { it.endsWith('Z') }.toLong()
-    }
-    return lowestCommonMultiple(factors)
+    }.lowestCommonMultiple()
 }
 
 
-fun lowestCommonMultiple(numbers: List<Long>): Long =
-    numbers.fold(1L) { x, y -> x * (y / greatestCommonDenominator(x, y)) }
+fun List<Long>.lowestCommonMultiple(): Long =
+    fold(1L) { x, y -> x * (y / greatestCommonDenominator(x, y)) }
 
-fun greatestCommonDenominator(x: Long, y: Long):Long =
+tailrec fun greatestCommonDenominator(x: Long, y: Long):Long =
     if (y == 0L) x else greatestCommonDenominator(y, x % y)
