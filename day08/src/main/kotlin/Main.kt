@@ -3,17 +3,10 @@ fun main() {
     partTwo(sampleData)
 }
 
-enum class Direction {
-    Left, Right
-}
+enum class Direction { Left, Right }
 
-data class Instructions(var nextStep:Int = 0, val directions:List<Direction>, var count:Int = 0 ) {
-    fun nextStep():Direction {
-        val next = directions[nextStep]
-        if (nextStep < directions.lastIndex) nextStep ++ else nextStep = 0
-        count ++
-        return next
-    }
+data class Instructions(val directions:List<Direction>, var count:Int = 0 ) {
+    fun nextStep():Direction = directions[count++ % directions.size]
 }
 
 fun List<String>.toInstructions() = Instructions(directions  = first().toDirections())
@@ -33,7 +26,7 @@ fun List<String>.toNodes(nodes:MutableMap<String, Map<Direction, String>> = muta
 fun partOne(sampleData:List<String>) :Int {
     val instructions = sampleData.toInstructions()
     val nodes = sampleData.toNodes()
-    return countToTarget(nodes, instructions, "AAA",{it == "ZZZ"})
+    return countToTarget(nodes, instructions, "AAA") { it == "ZZZ" }
 }
 
 fun countToTarget(nodes: Nodes, instructions: Instructions, startKey:String, target:(String)->Boolean): Int {
@@ -48,7 +41,7 @@ fun partTwo(sampleData:List<String>):Long {
     val nodes = sampleData.toNodes()
     val factors = nodes.keys.filter{it.endsWith('A')}.map { startKey ->
         val instructions = sampleData.toInstructions()
-        countToTarget(nodes, instructions, startKey, {it.endsWith('Z')}).toLong()
+        countToTarget(nodes, instructions, startKey) { it.endsWith('Z') }.toLong()
     }
     return lowestCommonMultiple(factors)
 }
