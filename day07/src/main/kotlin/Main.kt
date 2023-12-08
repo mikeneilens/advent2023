@@ -17,17 +17,17 @@ enum class HandType(val value:Double, val typeWithWildCard:HandType?) {
     OnePair(14.0.pow(5), ThreeOfAKind),
     HighCard(0.0, OnePair);
 
-    fun promoteIf(hasWildCard:Boolean) = if (hasWildCard) this.typeWithWildCard else this
+    fun promoteIfAnyWildCards(noOfWildCards:Int) = if (noOfWildCards > 0) this.typeWithWildCard else this
 
     companion object {
         fun fromHand(hand:HandForGame) = when(hand.noOfDistinctCards) {
             listOf(5) -> FiveOfAKind
-            listOf(1,4) -> FourOfAKind.promoteIf(hand.noOfWildCards > 0)
-            listOf(2,3) -> FullHouse.promoteIf(hand.noOfWildCards > 0)
-            listOf(1,1,3) -> ThreeOfAKind.promoteIf(hand.noOfWildCards > 0)
-            listOf(1,2,2) -> if(hand.noOfWildCards == 2 ) FourOfAKind else TwoPair.promoteIf(hand.noOfWildCards > 0)
-            listOf(1,1,1,2) -> OnePair.promoteIf(hand.noOfWildCards > 0)
-            else ->  HighCard.promoteIf(hand.noOfWildCards > 0)
+            listOf(1,4) -> FourOfAKind.promoteIfAnyWildCards(hand.noOfWildCards)
+            listOf(2,3) -> FullHouse.promoteIfAnyWildCards(hand.noOfWildCards)
+            listOf(1,1,3) -> ThreeOfAKind.promoteIfAnyWildCards(hand.noOfWildCards)
+            listOf(1,2,2) -> if(hand.noOfWildCards == 2 ) FourOfAKind else TwoPair.promoteIfAnyWildCards(hand.noOfWildCards)
+            listOf(1,1,1,2) -> OnePair.promoteIfAnyWildCards(hand.noOfWildCards)
+            else ->  HighCard.promoteIfAnyWildCards(hand.noOfWildCards)
         }
     }
 }
