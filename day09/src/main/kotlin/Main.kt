@@ -6,7 +6,7 @@ typealias History = List<Int>
 
 fun List<String>.parse() = map{it.split(" ").map(String::toInt)}
 
-fun History.listOfDifferences() = drop(1).fold(Pair(first(), listOf<Int>())){ (last, result), v -> Pair(v, result + (v - last))}.second
+fun History.listOfDifferences() = drop(1).fold(Pair(first(), listOf<Int>())){ (previous, result), v -> Pair(v, result + (v - previous))}.second
 
 tailrec fun List<Int>.allDifferences(result:List<History> = listOf() ):List<History> =
     if (all { it==0 }) result
