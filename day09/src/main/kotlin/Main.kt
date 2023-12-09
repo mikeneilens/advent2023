@@ -1,8 +1,3 @@
-fun main(args: Array<String>) {
-    partOne(sampleData)
-    partTwo(sampleData)
-}
-
 fun partOne(sampleData:List<String>) :Int {
     return sampleData.parse().sumOf { it.sumLast() }
 }
