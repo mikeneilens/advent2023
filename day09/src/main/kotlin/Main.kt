@@ -12,7 +12,7 @@ tailrec fun List<Int>.allDifferences(result:List<History> = listOf() ):List<Hist
     if (all { it==0 }) result
     else listOfDifferences().allDifferences(result + listOf(listOfDifferences()))
 
-fun History.sumLast() = last() + allDifferences().sumOf(History::last)
+fun History.sumLast() = allDifferences(listOf(this)).sumOf(History::last)
 
 fun partTwo(sampleData:List<String>):Int {
     return sampleData.parse().map(List<Int>::reversed). sumOf(History::sumLast)
