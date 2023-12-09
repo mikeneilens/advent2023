@@ -2,22 +2,20 @@ fun partOne(sampleData:List<String>) :Int {
     return sampleData.parse().sumOf { it.sumLast() }
 }
 
+typealias History = List<Int>
+
 fun List<String>.parse() = map{it.split(" ").map(String::toInt)}
 
-fun List<Int>.toDifference():List<Int> = drop(1).fold(Pair(first(), listOf<Int>())){(last, result), v -> Pair(v, result + (v - last))}.second
+fun History.listOfDifferences() = drop(1).fold(Pair(first(), listOf<Int>())){ (last, result), v -> Pair(v, result + (v - last))}.second
 
-tailrec fun List<Int>.allDifferences(result:List<List<Int>> = mutableListOf() ):List<List<Int>> {
-    if (all { it==0 }) return result
-    else {
-        val differenceList:List<Int> = toDifference()
-        return differenceList.allDifferences(result + listOf(differenceList))
-    }
-}
+tailrec fun List<Int>.allDifferences(result:List<History> = mutableListOf() ):List<History> =
+    if (all { it==0 }) result
+    else listOfDifferences().allDifferences(result + listOf(listOfDifferences()))
 
-fun List<Int>.sumLast():Int = last() + allDifferences().sumOf{it.last()}
+fun History.sumLast() = last() + allDifferences().sumOf{it.last()}
 
 fun partTwo(sampleData:List<String>):Int {
     return sampleData.parse().sumOf { it.sumFirst() }
 }
 
-fun List<Int>.sumFirst():Int = first() - allDifferences().reversed().map{it.first()}.fold(0){a, v ->  v - a }
+fun History.sumFirst():Int = first() - allDifferences().reversed().map{it.first()}.fold(0){a, v ->  v - a }

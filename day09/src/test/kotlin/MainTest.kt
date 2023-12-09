@@ -14,10 +14,10 @@ class MainTest:WordSpec({
             testData.parse() shouldBe listOf(listOf(0,3, 6, 9, 12, 15),listOf(1, 3, 6, 10, 15, 21),listOf(10, 13, 16, 21, 30, 45))
         }
         "0 3 6 9 12 15 differences are listOf(3, 3, 3, 3, 3)" {
-            listOf(0, 3, 6, 9, 12, 15).toDifference() shouldBe  listOf(3, 3, 3, 3, 3)
+            listOf(0, 3, 6, 9, 12, 15).listOfDifferences() shouldBe  listOf(3, 3, 3, 3, 3)
         }
         "10 13 16 21 30 45 differences are listOf(3, 3, 3, 3, 3)" {
-            listOf(10, 13, 16, 21, 30, 45).toDifference() shouldBe  listOf(3, 3, 5, 9, 15)
+            listOf(10, 13, 16, 21, 30, 45).listOfDifferences() shouldBe  listOf(3, 3, 5, 9, 15)
         }
         "0 3 6 9 12 15 all differences are listOf(listOf(3, 3, 3, 3, 3),listOf(0, 0, 0, 0))" {
             listOf(0, 3, 6, 9, 12, 15).allDifferences() shouldBe  listOf(listOf(3, 3, 3, 3, 3),listOf(0, 0, 0, 0))
