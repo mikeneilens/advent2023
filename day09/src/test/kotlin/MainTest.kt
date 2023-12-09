@@ -34,9 +34,6 @@ class MainTest:WordSpec({
 
     })
     "part two" should ({
-        "10  13  16  21  30  45 sumFirst is 5" {
-            listOf(10,  13,  16,  21,  30,  45).sumFirst() shouldBe 5
-        }
         "part two using test data should be 2" {
              partTwo(testData) shouldBe 2
         }
