@@ -33,17 +33,17 @@ class MainTest:WordSpec({
         }
         "pipe locations next to 1,1 in test data are (2,1) and (1,2)  " {
             testData1.pipesNextTo(Position(1,1)) shouldBe listOf(
-                Pair(Position(2,1),Connection('-',Direction.Right)),
-                Pair(Position(1,2),Connection('|',Direction.Down)))
+                Pair(Position(2,1),Pipe('-',Direction.Right)),
+                Pair(Position(1,2),Pipe('|',Direction.Down)))
         }
         "pipe locations not visited next to 1,1 when (1,2) has been visited in test data are (2,1) " {
-            testData1.pipesNotVisitedNextTo(Position(1,1), mutableListOf(Position(1,2))) shouldBe listOf(Pair(Position(x=2, y=1), Connection('-', Direction.Right)))
+            testData1.pipesNotVisitedNextTo(Position(1,1), mutableListOf(Position(1,2))) shouldBe listOf(Pair(Position(x=2, y=1), Pipe('-', Direction.Right)))
         }
         "pipe locations not visited next to 1,1 when (1,2) and (2,1) has been visited in test data is empty " {
             testData1.pipesNotVisitedNextTo(Position(1,1), mutableListOf(Position(1,2),Position(2,1))) shouldBe listOf<Pair<Int,Int>>()
         }
         "traversing loop of testdata1 starting at 1,1" {
-            val connections = mutableListOf<Connection>()
+            val connections = mutableListOf<Pipe>()
             testData1.traverseLoop(Position(1,1), connections= connections) shouldBe listOf(
                 Position(x=1, y=1),
                 Position(x=2, y=1),
@@ -54,13 +54,13 @@ class MainTest:WordSpec({
                 Position(x=1, y=3),
                 Position(x=1, y=2))
             connections shouldBe listOf(
-                Connection(type='-', direction=Direction.Right),
-                Connection(type='7', direction=Direction.Right),
-                Connection(type='|', direction=Direction.Down),
-                Connection(type='J', direction=Direction.Down),
-                Connection(type='-', direction=Direction.Left),
-                Connection(type='L', direction=Direction.Left),
-                Connection(type='|', direction=Direction.Up)
+                Pipe(type='-', direction=Direction.Right),
+                Pipe(type='7', direction=Direction.Right),
+                Pipe(type='|', direction=Direction.Down),
+                Pipe(type='J', direction=Direction.Down),
+                Pipe(type='-', direction=Direction.Left),
+                Pipe(type='L', direction=Direction.Left),
+                Pipe(type='|', direction=Direction.Up)
             )
         }
         "traversing loop of testdata2 starting at 0,2" {

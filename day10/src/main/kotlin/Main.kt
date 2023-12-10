@@ -1,28 +1,28 @@
 data class Position(val x:Int = 0, val y:Int = 0) {
     infix operator fun plus(other:Position) = Position(this.x + other.x, this.y + other.y)
 
-    fun surroundPositions(maxX:Int, maxY:Int) = listOf(Position(x -1, y), Position( y -1, x),Position(x +1, y), Position( y +1, x)).filter{ it.x in 0..maxX && it.y in 0..maxY  }
+    fun surroundingPositions(maxX:Int, maxY:Int) = listOf(Position(x -1, y), Position( y -1, x),Position(x +1, y), Position( y +1, x)).filter{ it.x in 0..maxX && it.y in 0..maxY  }
 }
 
-data class ValidConnection(val pipes:List<Connection>)
+data class ValidPipe(val pipes:List<Pipe>)
 
 enum class Direction(val offset:Position){Left(Position(-1,0)), Right(Position(1,0)), Up(Position(0,-1)), Down(Position(0,1))}
 
-data class Connection(val type:Char, val direction:Direction)
+data class Pipe(val type:Char, val direction:Direction)
 
-val validRightConnections = ValidConnection(pipes = listOf(Connection('-', Direction.Right), Connection('7', Direction.Right), Connection('J',Direction.Right),Connection('S',Direction.Right)))
-val validLeftConnections = ValidConnection(pipes = listOf(Connection('-', Direction.Left),Connection('F', Direction.Left),Connection('L', Direction.Left),Connection('S',Direction.Left)))
-val validUpConnections = ValidConnection(pipes = listOf(Connection('|', Direction.Up),Connection('7', Direction.Up),Connection('F', Direction.Up),Connection('S',Direction.Up)))
-val validDownConnections = ValidConnection(pipes = listOf(Connection('|',Direction.Down), Connection('J', Direction.Down),Connection('L', Direction.Down),Connection('S',Direction.Down)))
+val validRightPipes = ValidPipe(pipes = listOf(Pipe('-', Direction.Right), Pipe('7', Direction.Right), Pipe('J',Direction.Right),Pipe('S',Direction.Right)))
+val validLeftPipes = ValidPipe(pipes = listOf(Pipe('-', Direction.Left),Pipe('F', Direction.Left),Pipe('L', Direction.Left),Pipe('S',Direction.Left)))
+val validUpPipes = ValidPipe(pipes = listOf(Pipe('|', Direction.Up),Pipe('7', Direction.Up),Pipe('F', Direction.Up),Pipe('S',Direction.Up)))
+val validDownPipes = ValidPipe(pipes = listOf(Pipe('|',Direction.Down), Pipe('J', Direction.Down),Pipe('L', Direction.Down),Pipe('S',Direction.Down)))
 
-val validConnections = mapOf(
-    '|' to ValidConnection(validUpConnections.pipes + validDownConnections.pipes),
-    '-' to ValidConnection(validLeftConnections.pipes + validRightConnections.pipes),
-    'L' to ValidConnection(validUpConnections.pipes + validRightConnections.pipes),
-    'J' to ValidConnection(validUpConnections.pipes + validLeftConnections.pipes),
-    '7' to ValidConnection(validLeftConnections.pipes + validDownConnections.pipes),
-    'F' to ValidConnection(validRightConnections.pipes + validDownConnections.pipes),
-    'S' to ValidConnection(validLeftConnections.pipes + validRightConnections.pipes + validUpConnections.pipes + validDownConnections.pipes)
+val validPipes = mapOf(
+    '|' to ValidPipe(validUpPipes.pipes + validDownPipes.pipes),
+    '-' to ValidPipe(validLeftPipes.pipes + validRightPipes.pipes),
+    'L' to ValidPipe(validUpPipes.pipes + validRightPipes.pipes),
+    'J' to ValidPipe(validUpPipes.pipes + validLeftPipes.pipes),
+    '7' to ValidPipe(validLeftPipes.pipes + validDownPipes.pipes),
+    'F' to ValidPipe(validRightPipes.pipes + validDownPipes.pipes),
+    'S' to ValidPipe(validLeftPipes.pipes + validRightPipes.pipes + validUpPipes.pipes + validDownPipes.pipes)
 )
 
 typealias Maze = List<String>
@@ -30,14 +30,14 @@ typealias Maze = List<String>
 fun Maze.pipeAt(position:Position) = if (position.x !in 0..(first().lastIndex) || position.y !in 0..lastIndex) '.' else get(position.y)[position.x]
 
 fun Maze.pipesNextTo(position:Position) =
-    validConnections.getValue(pipeAt(position)).pipes
-        .filter{connection:Connection ->  connection.type == pipeAt(position + connection.direction.offset)}
+    validPipes.getValue(pipeAt(position)).pipes
+        .filter{connection:Pipe ->  connection.type == pipeAt(position + connection.direction.offset)}
         .map{Pair(position + it.direction.offset, it)}
 
 fun Maze.pipesNotVisitedNextTo(position: Position, visited:MutableList<Position>) =
     pipesNextTo(position).filter { it.first !in visited }
 
-tailrec fun Maze.traverseLoop(position:Position, visited:MutableList<Position> = mutableListOf(),  connections:MutableList<Connection> = mutableListOf()):MutableList<Position> {
+tailrec fun Maze.traverseLoop(position:Position, visited:MutableList<Position> = mutableListOf(),  connections:MutableList<Pipe> = mutableListOf()):MutableList<Position> {
     visited.add(position)
     val nextPipe = pipesNotVisitedNextTo(position,visited)
     return if (nextPipe.isEmpty()) visited
@@ -59,7 +59,7 @@ fun partOne(sampleData:List<String>) :Int {
 }
 
 fun partTwo(sampleData:List<String>):Int {
-    val (visits, connections) = visitsAndConnections(sampleData)
+    val (visits, connections) = visitsAndPipes(sampleData)
     val map = addVisitsToMap(visits)
     map.addSidesToMap(visits, connections, side1,'1')
     map.addSidesToMap(visits, connections, side2,'2')
@@ -68,23 +68,16 @@ fun partTwo(sampleData:List<String>):Int {
     return map.values.count { it == '2' }
 }
 
-fun visitsAndConnections(sampleData:List<String>):Pair<List<Position>,List<Connection>> {
+fun visitsAndPipes(sampleData:List<String>):Pair<List<Position>,List<Pipe>> {
     val startPosition = sampleData.startPosition()
-    val connections = mutableListOf(Connection('S',Direction.Down))
+    val connections = mutableListOf(Pipe('S',Direction.Down))
     val visited = sampleData.traverseLoop(startPosition, connections = connections)
-    replaceS(sampleData, visited, connections)
     return Pair(visited, connections)
-}
-
-fun replaceS(sampleData: List<String>, visited: List<Position>, connections: MutableList<Connection>) {
-    val directionOfS = sampleData.pipesNotVisitedNextTo(visited.last(), visited.drop(1).toMutableList()).first().second.direction
-    val typeOfS = sMap.getValue(Pair(connections.last().direction, connections[1].direction))
-    connections[0] = Connection(typeOfS, directionOfS)
 }
 
 fun addVisitsToMap(visited:List<Position>):MutableMap<Position,Char> = visited.associateWith { 'P' }.toMutableMap()
 
-fun MutableMap<Position,Char>.addSidesToMap(visited: List<Position>, connections: List<Connection>, sideMap:Map<Connection,List<Position>>, symbol:Char) {
+fun MutableMap<Position,Char>.addSidesToMap(visited: List<Position>, connections: List<Pipe>, sideMap:Map<Pipe,List<Position>>, symbol:Char) {
     visited.zip(connections).forEach{(position, connection) ->
         sideMap[connection]?.forEach {offset ->
             if (  !contains(position + offset)) set(position + offset,symbol)
@@ -93,54 +86,39 @@ fun MutableMap<Position,Char>.addSidesToMap(visited: List<Position>, connections
 }
 
 fun MutableMap<Position,Char>.floodMap(symbol:Char, maxX:Int, maxY:Int) {
-    val newPositions = filter{it.value == symbol}.keys.flatMap{it.surroundPositions(maxX, maxY)}.filter{this[it] == null}
+    val newPositions = filter{it.value == symbol}.keys.flatMap{it.surroundingPositions(maxX, maxY)}.filter{it !in this}
     if (newPositions.isEmpty()) return
     newPositions.forEach { set(it, symbol) }
     floodMap(symbol, maxX, maxY)
 }
 
-val sMap = mapOf(
-    Pair(Direction.Down,Direction.Right) to 'L',
-    Pair(Direction.Down,Direction.Down) to '|',
-    Pair(Direction.Down,Direction.Left) to 'J',
-    Pair(Direction.Left,Direction.Down) to 'F',
-    Pair(Direction.Left,Direction.Left) to '-',
-    Pair(Direction.Left,Direction.Up) to 'L',
-    Pair(Direction.Up,Direction.Left) to '7',
-    Pair(Direction.Up,Direction.Up) to '|',
-    Pair(Direction.Up,Direction.Right) to 'F',
-    Pair(Direction.Right,Direction.Up) to 'J',
-    Pair(Direction.Right,Direction.Right) to '-',
-    Pair(Direction.Right,Direction.Down) to '7',
-)
-
 val side1 = mapOf(
-    Connection('|', Direction.Up) to listOf(Position(x= -1)),
-    Connection('|', Direction.Down) to listOf(Position(x= +1)),
-    Connection('-', Direction.Right) to listOf(Position(y= -1)),
-    Connection('-', Direction.Left) to listOf(Position(y= +1)),
-    Connection('L', Direction.Left) to listOf(Position(x= -1),Position(x= -1,y= +1),Position(y= +1 )),
-    Connection('L', Direction.Down) to listOf(),
-    Connection('J', Direction.Down) to listOf(Position(x= +1),Position(x= +1,y= +1),Position(y= +1 )),
-    Connection('J', Direction.Right) to listOf(),
-    Connection('7', Direction.Right) to listOf(Position(x= +1),Position(x= +1,y= -1),Position(y= -1 )),
-    Connection('7', Direction.Up) to listOf(),
-    Connection('F', Direction.Up) to listOf(Position(x= -1),Position(x= -1,y= -1),Position(y= -1 )),
-    Connection('F', Direction.Left) to listOf(),
+    Pipe('|', Direction.Up) to listOf(Position(x= -1)),
+    Pipe('|', Direction.Down) to listOf(Position(x= +1)),
+    Pipe('-', Direction.Right) to listOf(Position(y= -1)),
+    Pipe('-', Direction.Left) to listOf(Position(y= +1)),
+    Pipe('L', Direction.Left) to listOf(Position(x= -1),Position(x= -1,y= +1),Position(y= +1 )),
+    Pipe('L', Direction.Down) to listOf(),
+    Pipe('J', Direction.Down) to listOf(Position(x= +1),Position(x= +1,y= +1),Position(y= +1 )),
+    Pipe('J', Direction.Right) to listOf(),
+    Pipe('7', Direction.Right) to listOf(Position(x= +1),Position(x= +1,y= -1),Position(y= -1 )),
+    Pipe('7', Direction.Up) to listOf(),
+    Pipe('F', Direction.Up) to listOf(Position(x= -1),Position(x= -1,y= -1),Position(y= -1 )),
+    Pipe('F', Direction.Left) to listOf(),
 )
 val side2 = mapOf(
-    Connection('|', Direction.Up) to side1.getValue(Connection('|', Direction.Down)),
-    Connection('|', Direction.Down) to side1.getValue(Connection('|', Direction.Up)),
-    Connection('-', Direction.Right) to side1.getValue(Connection('-', Direction.Left)),
-    Connection('-', Direction.Left) to side1.getValue(Connection('-', Direction.Right)),
-    Connection('L', Direction.Left) to side1.getValue(Connection('L', Direction.Down)),
-    Connection('L', Direction.Down) to  side1.getValue(Connection('L', Direction.Left)),
-    Connection('J', Direction.Down) to side1.getValue(Connection('J', Direction.Right)),
-    Connection('J', Direction.Right) to side1.getValue(Connection('J', Direction.Down)),
-    Connection('7', Direction.Right) to side1.getValue(Connection('7', Direction.Up)),
-    Connection('7', Direction.Up) to side1.getValue(Connection('7', Direction.Right)),
-    Connection('F', Direction.Up) to side1.getValue(Connection('F', Direction.Left)),
-    Connection('F', Direction.Left) to side1.getValue(Connection('F', Direction.Up)),
+    Pipe('|', Direction.Up) to side1.getValue(Pipe('|', Direction.Down)),
+    Pipe('|', Direction.Down) to side1.getValue(Pipe('|', Direction.Up)),
+    Pipe('-', Direction.Right) to side1.getValue(Pipe('-', Direction.Left)),
+    Pipe('-', Direction.Left) to side1.getValue(Pipe('-', Direction.Right)),
+    Pipe('L', Direction.Left) to side1.getValue(Pipe('L', Direction.Down)),
+    Pipe('L', Direction.Down) to  side1.getValue(Pipe('L', Direction.Left)),
+    Pipe('J', Direction.Down) to side1.getValue(Pipe('J', Direction.Right)),
+    Pipe('J', Direction.Right) to side1.getValue(Pipe('J', Direction.Down)),
+    Pipe('7', Direction.Right) to side1.getValue(Pipe('7', Direction.Up)),
+    Pipe('7', Direction.Up) to side1.getValue(Pipe('7', Direction.Right)),
+    Pipe('F', Direction.Up) to side1.getValue(Pipe('F', Direction.Left)),
+    Pipe('F', Direction.Left) to side1.getValue(Pipe('F', Direction.Up)),
 )
 
 fun Map<Position, Char>.print() {
