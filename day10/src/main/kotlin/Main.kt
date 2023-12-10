@@ -10,19 +10,19 @@ enum class Direction(val offset:Position){Left(Position(-1,0)), Right(Position(1
 
 data class Pipe(val type:Char, val direction:Direction)
 
-val validRightPipes = ValidPipe(pipes = listOf(Pipe('-', Direction.Right), Pipe('7', Direction.Right), Pipe('J',Direction.Right),Pipe('S',Direction.Right)))
-val validLeftPipes = ValidPipe(pipes = listOf(Pipe('-', Direction.Left),Pipe('F', Direction.Left),Pipe('L', Direction.Left),Pipe('S',Direction.Left)))
-val validUpPipes = ValidPipe(pipes = listOf(Pipe('|', Direction.Up),Pipe('7', Direction.Up),Pipe('F', Direction.Up),Pipe('S',Direction.Up)))
-val validDownPipes = ValidPipe(pipes = listOf(Pipe('|',Direction.Down), Pipe('J', Direction.Down),Pipe('L', Direction.Down),Pipe('S',Direction.Down)))
+val validRightPipes = listOf(Pipe('-', Direction.Right), Pipe('7', Direction.Right), Pipe('J',Direction.Right),Pipe('S',Direction.Right))
+val validLeftPipes = listOf(Pipe('-', Direction.Left),Pipe('F', Direction.Left),Pipe('L', Direction.Left),Pipe('S',Direction.Left))
+val validUpPipes = listOf(Pipe('|', Direction.Up),Pipe('7', Direction.Up),Pipe('F', Direction.Up),Pipe('S',Direction.Up))
+val validDownPipes = listOf(Pipe('|',Direction.Down), Pipe('J', Direction.Down),Pipe('L', Direction.Down),Pipe('S',Direction.Down))
 
 val validPipes = mapOf(
-    '|' to ValidPipe(validUpPipes.pipes + validDownPipes.pipes),
-    '-' to ValidPipe(validLeftPipes.pipes + validRightPipes.pipes),
-    'L' to ValidPipe(validUpPipes.pipes + validRightPipes.pipes),
-    'J' to ValidPipe(validUpPipes.pipes + validLeftPipes.pipes),
-    '7' to ValidPipe(validLeftPipes.pipes + validDownPipes.pipes),
-    'F' to ValidPipe(validRightPipes.pipes + validDownPipes.pipes),
-    'S' to ValidPipe(validLeftPipes.pipes + validRightPipes.pipes + validUpPipes.pipes + validDownPipes.pipes)
+    '|' to validUpPipes + validDownPipes,
+    '-' to validLeftPipes + validRightPipes,
+    'L' to validUpPipes + validRightPipes,
+    'J' to validUpPipes + validLeftPipes,
+    '7' to validLeftPipes + validDownPipes,
+    'F' to validRightPipes + validDownPipes,
+    'S' to validLeftPipes + validRightPipes + validUpPipes + validDownPipes
 )
 
 typealias Maze = List<String>
@@ -30,7 +30,7 @@ typealias Maze = List<String>
 fun Maze.pipeAt(position:Position) = if (position.x !in 0..(first().lastIndex) || position.y !in 0..lastIndex) '.' else get(position.y)[position.x]
 
 fun Maze.pipesNextTo(position:Position) =
-    validPipes.getValue(pipeAt(position)).pipes
+    validPipes.getValue(pipeAt(position))
         .filter{connection:Pipe ->  connection.type == pipeAt(position + connection.direction.offset)}
         .map{Pair(position + it.direction.offset, it)}
 
