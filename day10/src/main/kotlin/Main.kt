@@ -4,8 +4,6 @@ data class Position(val x:Int = 0, val y:Int = 0) {
     fun surroundingPositions(maxX:Int, maxY:Int) = listOf(Position(x -1, y), Position( y -1, x),Position(x +1, y), Position( y +1, x)).filter{ it.x in 0..maxX && it.y in 0..maxY  }
 }
 
-data class ValidPipe(val pipes:List<Pipe>)
-
 enum class Direction(val offset:Position){Left(Position(-1,0)), Right(Position(1,0)), Up(Position(0,-1)), Down(Position(0,1))}
 
 data class Pipe(val type:Char, val direction:Direction)
