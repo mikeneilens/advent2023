@@ -62,8 +62,8 @@ fun partOne(sampleData:List<String>,S:Char) :Int {
 fun partTwo(sampleData:List<String>):Int {
     val (visits, connections) = visitsAndConnections(sampleData)
     val map = addVisitsToMap(visits)
-    map.SidesToMap(visits, connections, side1,'1')
-    map.SidesToMap(visits, connections, side2,'2')
+    map.AddSidesToMap(visits, connections, side1,'1')
+    map.AddSidesToMap(visits, connections, side2,'2')
     map.floodMap('2', sampleData.first().lastIndex, sampleData.lastIndex)
     map.print()
     return map.values.count { it == '2' }
@@ -71,10 +71,10 @@ fun partTwo(sampleData:List<String>):Int {
 
 fun addVisitsToMap(visited:List<Position>):MutableMap<Position,Char> = visited.map{Pair(it, 'P')}.toMap().toMutableMap()
 
-fun MutableMap<Position,Char>.SidesToMap(visited: List<Position>, connections: List<Connection>, sideMap:Map<Connection,List<Position>>, symbol:Char) {
+fun MutableMap<Position,Char>.AddSidesToMap(visited: List<Position>, connections: List<Connection>, sideMap:Map<Connection,List<Position>>, symbol:Char) {
     visited.zip(connections).forEach{(Position, Connection) ->
         sideMap[Connection]?.forEach {offset ->
-            if (this[Position + offset] == null) this[Position + offset] = symbol
+            if (  !contains(Position + offset)) set(Position + offset,symbol)
         }
     }
 }
@@ -86,23 +86,18 @@ fun MutableMap<Position,Char>.floodMap(symbol:Char, maxX:Int, maxY:Int) {
     floodMap(symbol, maxX, maxY)
 }
 
-fun Map<Position, Char>.print() {
-    (0..(keys.map{it.y}.max())).forEach{y ->
-        (0..(keys.map{it.y}.max())).forEach { x ->
-            print( this[Position(x,y)] ?: ' ')
-        }
-        println()
-    }
-}
-
 fun visitsAndConnections(sampleData:List<String>):Pair<List<Position>,List<Connection>> {
     val startPosition = sampleData.startPosition()
-    val connections = mutableListOf<Connection>(Connection('S',Direction.Down))
+    val connections = mutableListOf(Connection('S',Direction.Down))
     val visited = sampleData.traverseLoop(startPosition, connections = connections)
-    val directionOfS:Direction = sampleData.pipesNotVisitedNextTo(visited.last(),visited.drop(1).toMutableList()).first().second.direction
-    val typeOfS = sMap[Pair(connections.last().direction, connections[1].direction)] ?: ' '
-    connections[0] = Connection(typeOfS, directionOfS)
+    replaceS(sampleData, visited, connections)
     return Pair(visited, connections)
+}
+
+fun replaceS(sampleData: List<String>, visited: MutableList<Position>, connections: MutableList<Connection>) {
+    val directionOfS = sampleData.pipesNotVisitedNextTo(visited.last(), visited.drop(1).toMutableList()).first().second.direction
+    val typeOfS = sMap.getValue(Pair(connections.last().direction, connections[1].direction))
+    connections[0] = Connection(typeOfS, directionOfS)
 }
 
 val sMap = mapOf(
@@ -148,3 +143,14 @@ val side2 = mapOf(
     Connection('F', Direction.Up) to side1.getValue(Connection('F', Direction.Left)),
     Connection('F', Direction.Left) to side1.getValue(Connection('F', Direction.Up)),
 )
+
+fun Map<Position, Char>.print() {
+    (0..(keys.map{it.y}.max())).forEach{y ->
+        (0..(keys.map{it.y}.max())).forEach { x ->
+            print( this[Position(x,y)] ?: ' ')
+        }
+        println()
+    }
+}
+
+
