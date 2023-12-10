@@ -71,13 +71,13 @@ class MainTest:WordSpec({
                 Position(x=1, y=3), Position(x=1, y=4), Position(x=0, y=4), Position(x=0, y=3))
         }
         "part one using testData1 should be 4" {
-            partOne(testData1,'F') shouldBe 4
+            partOne(testData1) shouldBe 4
         }
         "part one using testData2 should be 8" {
-            partOne(testData2, 'F') shouldBe 8
+            partOne(testData2) shouldBe 8
         }
         "part one using sample data should be 7005" {
-            partOne(sampleData, '7') shouldBe 7005
+            partOne(sampleData) shouldBe 7005
         }
     })
     "part two" should ({
