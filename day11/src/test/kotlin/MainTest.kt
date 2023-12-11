@@ -65,15 +65,21 @@ class MainTest:WordSpec({
             testData1.toPositions() shouldBe listOf(Position(x=0, y=2), Position(x=0, y=9), Position(x=1, y=5), Position(x=3, y=0), Position(x=4, y=9), Position(x=6, y=4), Position(x=7, y=1), Position(x=7, y=8), Position(x=9, y=6))
         }
         "part one for testData should be 374" {
-            partOne(testData1) shouldBe 374
+            partOne(testData1) shouldBe 374L
         }
         "part one for sample data should be 9918828" {
-            partOne(sampleData) shouldBe 9918828
+            partOne(sampleData) shouldBe 9918828L
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "part two for testData and width of 10 should be 1030" {
+            partTwo(testData1,10) shouldBe 1030L
+        }
+        "part two for testData and width of 100 should be 8410" {
+            partTwo(testData1,100) shouldBe 8410L
+        }
+        "part two for sample and width of 1000000 should be 692506533832" {
+            partTwo(sampleData,1000000) shouldBe 692506533832L
         }
     })
 })
