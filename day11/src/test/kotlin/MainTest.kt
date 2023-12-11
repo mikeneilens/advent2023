@@ -67,10 +67,11 @@ class MainTest:WordSpec({
 
         "galaxy pairs in the testdata" {
             val galaxyPairs = testData1.toPositions().galaxyPairs()
-             galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=0, y=9))) shouldBe true
-             galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=1, y=5))) shouldBe true
-             galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=3, y=0))) shouldBe true
-             galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=4, y=9))) shouldBe true
+            galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=0, y=9))) shouldBe true
+            galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=1, y=5))) shouldBe true
+            galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=3, y=0))) shouldBe true
+            galaxyPairs.contains(setOf(Position(x=0, y=2), Position(x=4, y=9))) shouldBe true
+            galaxyPairs.size shouldBe 36
         }
         "part one for testData should be 374" {
             partOne(testData1) shouldBe 374L
