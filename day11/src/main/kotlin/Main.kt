@@ -1,6 +1,4 @@
-data class Position(val x:Int = 0, val y:Int = 0) {
-    infix operator fun plus(other:Position) = Position(this.x + other.x, this.y + other.y)
-}
+data class Position(val x:Int = 0, val y:Int = 0)
 
 fun partOne(sampleData:List<String>, largeWidth:Int = 2) :Long {
     val rowWidths = sampleData.rowWidths(largeWidth)
@@ -12,7 +10,9 @@ fun List<String>.toPositions() = (0..(first().lastIndex)).flatMap { x ->
     (0..lastIndex).mapNotNull{y -> if (this[y][x] == '#') Position(x,y) else null}}
 
 fun List<Position>.total(rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
-    flatMap{first -> map{second -> setOf(first, second) }}.toSet().sumOf{it.first().distanceTo(it.last(), rowWidths, colWidths).toLong()}
+    galaxyPairs().sumOf{it.first().distanceTo(it.last(), rowWidths, colWidths).toLong()}
+
+fun List<Position>.galaxyPairs() = flatMap{first -> map{second -> setOf(first, second) }}.toSet()
 
 fun List<String>.rowWidths(largeWidth:Int = 2) =
     mapIndexed { i, s ->
@@ -24,11 +24,13 @@ fun List<String>.colWidths(largeWidth:Int = 2) =
         if (this.map{it[i]}.any{ it == '#'}) Pair(i,1) else Pair(i,largeWidth)
     }.toMap()
 
-fun distanceTo(s:Int, e:Int, colWidths:Map<Int, Int>) =
-    ((minOf(s, e) +1)..(maxOf(s, e) -1)).sumOf{ colWidths.getValue(it)} + 1
+fun distanceTo(start:Int, end:Int, colWidths:Map<Int, Int>) =
+    ((minOf(start, end) +1)..(maxOf(start, end) -1)).sumOf{ colWidths.getValue(it)} + 1
 
 fun Position.distanceTo(other:Position, rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
-    distanceTo(x, other.x, colWidths) + distanceTo(y, other.y, rowWidths) - listOf(Pair(x, other.x), Pair(y, other.y)).map{ if (it.first == it.second) 1 else 0 }.sum()
+    distanceTo(x, other.x, colWidths) + distanceTo(y, other.y, rowWidths) - noOfMatchingCoordinates(other)
+
+fun Position.noOfMatchingCoordinates(other:Position) = listOf(Pair(x, other.x), Pair(y, other.y)).count { it.first == it.second }
 
 fun partTwo(sampleData:List<String>, largeWidth:Int):Long {
     return partOne(sampleData, largeWidth)
