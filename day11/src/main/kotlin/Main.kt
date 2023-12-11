@@ -17,7 +17,7 @@ fun List<String>.toPositions() = (0..(first().lastIndex)).flatMap { x ->
     (0..lastIndex).mapNotNull{y -> if (this[y][x] == '#') Position(x,y) else null}}
 
 fun List<Position>.total(rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
-    flatMap{first -> map{second -> Pair(first, second) }}.sumOf{it.first.distanceTo(it.second, rowWidths, colWidths)}/2
+    flatMap{first -> map{second -> setOf(first, second) }}.toSet().sumOf{it.first().distanceTo(it.last(), rowWidths, colWidths)}
 
 fun List<String>.rowWidths() =
     mapIndexed { i, s ->
