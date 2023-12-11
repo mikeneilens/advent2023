@@ -12,7 +12,8 @@ fun List<String>.toPositions() = (0..(first().lastIndex)).flatMap { x ->
 fun List<Position>.total(rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
     galaxyPairs().sumOf{it.first().distanceTo(it.last(), rowWidths, colWidths).toLong()}
 
-fun List<Position>.galaxyPairs() = flatMap{first -> map{second -> setOf(first, second) }}.toSet()
+tailrec fun List<Position>.galaxyPairs(result:List<Set<Position>> = listOf()):List<Set<Position>> =
+    if (size < 2) result else drop(1).galaxyPairs( result + drop(1).map{setOf(first(),it) })
 
 fun List<String>.rowWidths(largeWidth:Int = 2) =
     mapIndexed { i, s ->
