@@ -16,14 +16,10 @@ tailrec fun List<Position>.galaxyPairs(result:List<Set<Position>> = listOf()):Li
     if (size < 2) result else drop(1).galaxyPairs( result + drop(1).map{setOf(first(),it) })
 
 fun List<String>.rowWidths(largeWidth:Int = 2) =
-    mapIndexed { i, s ->
-        if (s.any { it == '#' }) Pair(i,1) else Pair(i,largeWidth)
-    }.toMap()
+    mapIndexed { i, s -> if ('#' in s) Pair(i,1) else Pair(i,largeWidth) }.toMap()
 
 fun List<String>.colWidths(largeWidth:Int = 2) =
-    first().mapIndexed { i, _ ->
-        if (this.map{it[i]}.any{ it == '#'}) Pair(i,1) else Pair(i,largeWidth)
-    }.toMap()
+    first().indices.map {i -> if ('#' in this.map{it[i]}) Pair(i,1) else Pair(i,largeWidth) }.toMap()
 
 fun Position.distanceTo(other:Position, rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
     distanceTo(x, other.x, colWidths) + distanceTo(y, other.y, rowWidths) - noOfMatchingCoordinates(other)
