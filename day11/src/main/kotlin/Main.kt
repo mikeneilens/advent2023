@@ -24,11 +24,11 @@ fun List<String>.colWidths(largeWidth:Int = 2) =
         if (this.map{it[i]}.any{ it == '#'}) Pair(i,1) else Pair(i,largeWidth)
     }.toMap()
 
-fun distanceTo(start:Int, end:Int, colWidths:Map<Int, Int>) =
-    ((minOf(start, end) +1)..(maxOf(start, end) -1)).sumOf{ colWidths.getValue(it)} + 1
-
 fun Position.distanceTo(other:Position, rowWidths:Map<Int, Int>, colWidths:Map<Int, Int>) =
     distanceTo(x, other.x, colWidths) + distanceTo(y, other.y, rowWidths) - noOfMatchingCoordinates(other)
+
+fun distanceTo(start:Int, end:Int, widths:Map<Int, Int>) =
+    ((minOf(start, end) +1)..(maxOf(start, end) -1)).sumOf{ widths.getValue(it)} + 1
 
 fun Position.noOfMatchingCoordinates(other:Position) = listOf(Pair(x, other.x), Pair(y, other.y)).count { it.first == it.second }
 
