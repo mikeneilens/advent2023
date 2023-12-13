@@ -39,8 +39,8 @@ fun List<String>.alternateMirror():Pair<Int, Int> {
     (0..(first().lastIndex)).forEach{ x->
         (0..lastIndex).forEach{ y ->
             val updatedWindow = replace(x,y)
-            updatedWindow.mirrorOnLine(currentMirrorOnRow,List<String>::mirrorOnRow)?.let { return Pair(it,0) }
-            updatedWindow.mirrorOnLine(currentMirrorOnCol,List<String>::mirrorOnColumn)?.let { return Pair(0,it) }
+            updatedWindow.mirrorOnLine(currentMirrorOnRow, List<String>::mirrorOnRow)?.let { return Pair(it,0) }
+            updatedWindow.mirrorOnLine(currentMirrorOnCol, List<String>::mirrorOnColumn)?.let { return Pair(0,it) }
         }
     }
     return Pair(0,0 )
