@@ -35,10 +35,6 @@ class MainTest:WordSpec({
                 listOf(0, 7, 2, 5, 6, 0, 0, 0, 4, 2)
             )
         }
-        "weights on each row in test data" {
-            val rollsAbove = testdata1.rollsNorth()
-            testdata1.weightOnEachRow(rollsAbove) shouldBe listOf(10, 29, 0, 34, 19, 14, 15, 4, 0, 11)
-        }
         "part one with test data should be 136" {
             partOne(testdata1) shouldBe 136
         }
@@ -51,7 +47,7 @@ class MainTest:WordSpec({
             "OO.#O....O".rollsWest() shouldBe listOf(0, 0, 0, 0, 0, 0, 1, 2, 3, 4)
         }
         "test data rolled west" {
-            testdata1.mappedWest() shouldBe listOf(
+            testdata1.mapped(List<String>::rollsWest,::updateMapForWest) shouldBe listOf(
                 "O....#....",
                 "OOO.#....#",
                 ".....##...",
