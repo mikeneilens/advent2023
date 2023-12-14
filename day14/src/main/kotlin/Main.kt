@@ -1,7 +1,3 @@
-fun main(args: Array<String>) {
-    partOne(sampleData)
-    partTwo(sampleData)
-}
 
 fun partOne(sampleData:List<String>) :Int {
     return sampleData.weightOnEachRow(sampleData.rollsNorth()).sum()
@@ -24,7 +20,7 @@ fun List<String>.rollsNorth() =
     }.second.drop(1)
 
 fun partTwo(sampleData:List<String>):Int {
-    val scores = (0..300).fold(listOf(Pair(sampleData,0))){ a, v ->
+    val scores = (0..300).fold(listOf(Pair(sampleData,0))){ a, _ ->
         val cycled = a.last().first.cycled()
         a + listOf(Pair(cycled, cycled.weight()))
     }.map{it.second}
@@ -35,30 +31,34 @@ fun partTwo(sampleData:List<String>):Int {
 }
 
 fun String.rollsWest() =
-    foldIndexed(listOf<Int>()){i, result, c -> if (i == 0 || c == '#') result + listOf(0) else if (this[i -1] == '.' ) result + listOf(result.last() + 1) else result + listOf(result.last())}
+    foldIndexed(listOf<Int>()){i, result, c ->
+        if (i == 0 || c == '#')
+            result + listOf(0)
+        else if (this[i -1] == '.' ) result + listOf(result.last() + 1)
+        else result + listOf(result.last())
+    }
 
 fun List<String>.rollsWest() = map(String::rollsWest)
 
-fun List<String>.mappedWest():List<String> {
-    val rollsWest = rollsWest()
-    val map:MutableMap<Pair<Int,Int>, Char> = mutableMapOf()
-    forEachIndexed {row, string ->
-        string.forEachIndexed{col, c ->
-            if (c != '.') map[Pair(row, col - rollsWest[row][col])] = c
+fun List<String>.mappedNorth():List<String> = mapWithRolls(rollsNorth(), ::updateMapForNorth)
+
+fun List<String>.mappedWest():List<String> = mapWithRolls(rollsWest(), ::updateMapForWest)
+
+private fun List<String>.mapWithRolls(rollsNorth: List<List<Int>>, updater:(MutableMap<Pair<Int, Int>, Char>,Int, Int, Char, List<List<Int>>)->Unit): List<String> {
+    val map: MutableMap<Pair<Int, Int>, Char> = mutableMapOf()
+    forEachIndexed { row, string ->
+        string.forEachIndexed { col, c ->
+            if (c != '.') updater(map, row, col, c, rollsNorth)
         }
     }
-    return mapIndexed {row, string -> string.indices.map{col -> map[Pair(row, col)] ?: '.'   }.joinToString("")}
+    return mapIndexed { row, string -> string.indices.map { col -> map[Pair(row, col)] ?: '.' }.joinToString("") }
 }
 
-fun List<String>.mappedNorth():List<String> {
-    val rollsNorth = rollsNorth()
-    val map:MutableMap<Pair<Int,Int>, Char> = mutableMapOf()
-    forEachIndexed {row, string ->
-        string.forEachIndexed{col, c ->
-            if (c != '.') map[Pair(row - rollsNorth[row][col], col)] = c
-        }
-    }
-    return mapIndexed {row, string -> string.indices.map{col -> map[Pair(row, col)] ?: '.'   }.joinToString("")}
+fun updateMapForNorth(map: MutableMap<Pair<Int, Int>, Char>, row: Int, col: Int, c: Char, rollsNorth: List<List<Int>>) {
+    map[Pair(row - rollsNorth[row][col], col)] = c
+}
+fun updateMapForWest(map: MutableMap<Pair<Int, Int>, Char>, row: Int, col: Int, c: Char, rollsWest: List<List<Int>>) {
+    map[Pair(row, col - rollsWest[row][col])] = c
 }
 
 fun List<String>.cycled():List<String> =
