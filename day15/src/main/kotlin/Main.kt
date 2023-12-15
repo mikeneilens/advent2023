@@ -62,7 +62,7 @@ class UpsertLens(name:String, val focalLength:Int):LensInstruction(name){
         if (map.contains(box)) {
             val newLens = Lens(name, focalLength)
             map.getValue(box).upsertLens(newLens)
-            if (map[box]?.name == name) map[box] = newLens
+            if (map.firstItemHasSameName(box, name)) map[box] = newLens
         } else {
             map[box] = Lens(name, focalLength)
         }
@@ -72,10 +72,12 @@ class UpsertLens(name:String, val focalLength:Int):LensInstruction(name){
     override fun equals(other: Any?) = other is UpsertLens && name == other.name
 }
 
+fun Map<Int, Lens>.firstItemHasSameName(box:Int, name:String) = this[box]?.name == name
+
 class RemoveLens(name:String):LensInstruction(name) {
     override fun execute(map: MutableMap<Int, Lens>) {
         if (map.contains(box)) {
-            if (map[box]?.name == name) {
+            if (map.firstItemHasSameName(box, name)) {
                 map[box]?.next?.let{ map[box] = it} ?: map.remove(box)
             } else {
                 map[box]?.removeLens(name)
