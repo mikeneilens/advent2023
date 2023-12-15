@@ -16,7 +16,6 @@ fun String.parse() =
         else UpsertLens(string.split("=").first(), string.split("=").last().toInt() )
     }
 
-
 class Lens(val name:String, val focalLength:Int, var prev:Lens? = null, var next:Lens? = null) {
 
     fun findLensOrNull(name:String):Lens? = if (name == this.name) this else if (next == null) null else next?.findLensOrNull(name)
