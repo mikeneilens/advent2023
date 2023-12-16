@@ -36,7 +36,7 @@ data class Beam(val position:Position, val direction:Direction) {
         val newPosition = position + direction.offset
         if (newPosition !in grid.keys) return
         val collision = Collision(grid.getValue(newPosition), direction)
-        resultsOfCollision[collision]?.forEach {newDiretion -> Beam(newPosition, newDiretion).move(grid,beams) }
+        resultsOfCollision[collision]?.forEach {newDirection -> Beam(newPosition, newDirection).move(grid,beams) }
     }
 
 }
@@ -71,7 +71,7 @@ fun partTwo(sampleData:List<String>):Int {
     val maxRow = sampleData.lastIndex
     val maxCol = sampleData.first().lastIndex
     val beams = grid.beamFromLeft() + grid.beamFromTop() + grid.beamFromRight(maxCol) + grid.beamFromBottom(maxRow)
-    return beams.map { beam -> grid.visitedBy( beam.move(grid)).size }.max()
+    return beams.maxOf { beam -> grid.visitedBy(beam.move(grid)).size }
 }
 
 fun Map<Position, Char>.beamFromLeft() =
