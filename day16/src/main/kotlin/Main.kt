@@ -15,10 +15,10 @@ fun Map<Position, Char>.fireBeam(beam:Beam):Set<Beam> {
 
 fun Beam.move(grid:Map<Position, Char>, beams:MutableSet<Beam> = mutableSetOf()) {
     if (this in beams) return else beams.add(this)
-    val beam = copy(position = position + direction.offset )
-    if (beam.position !in grid.keys) return
-    val collision = Collision(grid.getValue(beam.position),beam.direction)
-    resultsOfCollision[collision]?.forEach { beam.copy(direction = it).move(grid,beams) }
+    val newPosition = position + direction.offset
+    if (newPosition !in grid.keys) return
+    val collision = Collision(grid.getValue(newPosition), direction)
+    resultsOfCollision[collision]?.forEach {newDiretion -> Beam(newPosition, newDiretion).move(grid,beams) }
 }
 
 fun Map<Position, Char>.visitedBy(beams:Set<Beam>):List<Position> {
