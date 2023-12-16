@@ -1,12 +1,17 @@
-fun partOne(sampleData:List<String>) :Int {
-    val beams = mutableSetOf<Beam>()
+fun partOne(sampleData:List<String>, beam:Beam = Beam(Position(0,-1),Direction.Right)) :Int {
     val grid = sampleData.toGrid()
-    Beam(Position(0,-1),Direction.Right).move(grid, beams)
+    val beams = grid.fireBeam(beam)
     return grid.visitedBy(beams).size
 }
 
 fun List<String>.toGrid() =
     flatMapIndexed{ row, s -> s.mapIndexed{ col, c -> Pair(Position(row, col),c)} }.toMap()
+
+fun Map<Position, Char>.fireBeam(beam:Beam):Set<Beam> {
+    val beams = mutableSetOf<Beam>()
+    beam.move(this, beams)
+    return beams
+}
 
 fun Beam.move(grid:Map<Position, Char>, beams:MutableSet<Beam> = mutableSetOf()) {
     if (this in beams) return else beams.add(this)
@@ -60,5 +65,21 @@ val resultsOfCollision = mapOf(
 )
 
 fun partTwo(sampleData:List<String>):Int {
-    return 0
+    val grid = sampleData.toGrid()
+    val maxRow = sampleData.lastIndex
+    val maxCol = sampleData.first().lastIndex
+    val beams = grid.beamFromLeft() + grid.beamFromTop() + grid.beamFromRight(maxCol) + grid.beamFromBottom(maxRow)
+    return beams.map { beam -> grid.visitedBy( grid.fireBeam(beam)).size }.max()
 }
+
+fun Map<Position, Char>.beamFromLeft() =
+    keys.filter{key -> key.col == 0 }.map{Beam(Position(it.row, - 1),Direction.Right)}
+
+fun Map<Position, Char>.beamFromRight(lastCol:Int) =
+    keys.filter{key -> key.col == lastCol }.map{Beam(Position(it.row, lastCol + 1),Direction.Left)}
+
+fun Map<Position, Char>.beamFromTop() =
+    keys.filter{key -> key.row == 0 }.map{Beam(Position( -1, it.col),Direction.Down)}
+
+fun Map<Position, Char>.beamFromBottom(lastRow:Int) =
+    keys.filter{key -> key.row == lastRow }.map{Beam(Position(lastRow + 1 , it.col),Direction.Up)}

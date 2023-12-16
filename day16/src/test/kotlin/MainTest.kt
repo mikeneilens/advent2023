@@ -30,8 +30,11 @@ class MainTest:WordSpec({
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "part two using test data should be 51" {
+            partTwo(testData) shouldBe 51
+        }
+        "part two using sample data should be 7041" {
+            partTwo(sampleData) shouldBe 7041
         }
     })
 })
