@@ -5,12 +5,12 @@ fun partOne(sampleData:String) :Int {
 fun String.hashAlgorithm() = fold(0){current, char -> ((current + char.code) * 17).rem(256) }
 
 fun partTwo(sampleData:String):Int {
-    val map:MutableMap<Int, Lens> = mutableMapOf()
-    sampleData.parse().forEach { it.execute(map) }
-    return map.toList().sumOf {(key, value) -> (key + 1) * value.power() }
+    val map:MutableMap<Int, Lens> = (0..255).map{Pair(it, Lens("Root", 0))}.toMap().toMutableMap()
+    sampleData.toLensInstruction().forEach { it.execute(map) }
+    return map.toList().sumOf {(key, value) -> (key + 1) * value.power(0) }
 }
 
-fun String.parse() =
+fun String.toLensInstruction() =
     split(",").map{string ->
         if (string.last() == '-') RemoveLens(string.dropLast(1))
         else UpsertLens(string.split("=").first(), string.split("=").last().toInt() )
@@ -58,32 +58,16 @@ sealed class LensInstruction(val name:String) {
 }
 
 class UpsertLens(name:String, val focalLength:Int):LensInstruction(name){
-    override fun execute(map: MutableMap<Int, Lens>) {
-        if (map.contains(box)) {
-            val newLens = Lens(name, focalLength)
-            map.getValue(box).upsertLens(newLens)
-            if (map.firstItemHasSameName(box, name)) map[box] = newLens
-        } else {
-            map[box] = Lens(name, focalLength)
-        }
-    }
+
+    override fun execute(map: MutableMap<Int, Lens>) { map[box]?.upsertLens(Lens(name, focalLength)) }
 
     override fun toString() = "UpsertLens(name=\"$name\", focalLength=$focalLength)"
     override fun equals(other: Any?) = other is UpsertLens && name == other.name
 }
 
-fun Map<Int, Lens>.firstItemHasSameName(box:Int, name:String) = this[box]?.name == name
-
 class RemoveLens(name:String):LensInstruction(name) {
-    override fun execute(map: MutableMap<Int, Lens>) {
-        if (map.contains(box)) {
-            if (map.firstItemHasSameName(box, name)) {
-                map[box]?.next?.let{ map[box] = it} ?: map.remove(box)
-            } else {
-                map[box]?.removeLens(name)
-            }
-        }
-    }
+
+    override fun execute(map: MutableMap<Int, Lens>) { map[box]?.removeLens(name) }
 
     override fun toString() = "RemoveLens(name=\"$name\")"
     override fun equals(other: Any?) = other is RemoveLens && name == other.name

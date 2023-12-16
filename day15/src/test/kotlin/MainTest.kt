@@ -58,7 +58,7 @@ class MainTest:WordSpec({
             lens2.next shouldBe null
         }
         "parse test data" {
-            testData.parse() shouldBe listOf(
+            testData.toLensInstruction() shouldBe listOf(
                 UpsertLens(name="rn", focalLength=1),
                 RemoveLens(name="cm"),
                 UpsertLens(name="qp", focalLength=3),
