@@ -2,65 +2,45 @@
 fun partOne(sampleData:List<String>) :Int {
     val parts = sampleData.toParts()
     val workflows = sampleData.toWorkFlows()
-    return parts.filter { part -> part.isValid("in", workflows) == "A" }.sumOf { it.properties.sum() }
+    return parts.filter { part -> part.isValid("in", workflows) == "A" }.sumOf { it.minProperties.sum() }
 }
+data class PotentialPart(val minProperties:List<Int> = listOf(1,1,1,1), val maxProperties:List<Int> = listOf(4000,4000, 4000,4000))
 
-data class Part(val properties:List<Int>)
-
-fun Part.isValid(workflow:String, workFlows:Map<String, List<Rule>>):String {
+fun PotentialPart.isValid(workflow:String, workFlows:Map<String, List<Rule>>):String {
     if (workflow == "A" || workflow == "R") return workflow
     val rules = workFlows.getValue(workflow)
-    return isValid(rules.first{rule -> rule.isValid(this)}.workflow, workFlows)
+    return isValid(rules.first{rule -> rule.isPotentialPart(this)}.workflow, workFlows)
 }
 
 fun List<String>.toParts() = joinToString("\n").split("\n\n")[1].split("\n")
     .map(String::toPart)
 
+fun String.toPart() = PotentialPart(partNos(), partNos())
+
+fun String.partNos() = removePrefix("{").removeSuffix("}").split(",").map{it.split("=").last().toInt()}
+
+data class Rule(val value:Int, val workflow:String, val propertyIndex:Int, val isPotentialPart:(PotentialPart)->Boolean, val validPart:(PotentialPart)->PotentialPart, val invalidPart:(PotentialPart)->PotentialPart)
+
 fun List<String>.toWorkFlows() = joinToString("\n").split("\n\n")[0].split("\n")
     .map{ s -> Pair( s.split("{").first(), s.toRules()) }.toMap()
 
-fun String.toPart() = Part(partNos())
-
-data class Rule(val value:Int, val workflow:String, val propertyIndex:Int, val isValid:(Part)->Boolean, val isPotentialPart:(PotentialPart)->Boolean, val validPart:(PotentialPart)->PotentialPart, val invalidPart:(PotentialPart)->PotentialPart)
-
 fun String.toRules() = split("{")[1].removeSuffix("}").split(",").map { it.toRule() }
 
-fun String.toRule():Rule {
-    val workflow = split(":").last()
-    return if (containsAConditon()) {
-        if (get(1) == '<') {
-            Rule(
-                value = value,
-                workflow = workflow,
-                propertyIndex = propertyIndex,
-                isValid = partLessThanRule(propertyIndex, value),
-                isPotentialPart = potentialPartLessThanRule(propertyIndex, value),
-                validPart = potentialPartForLessThan(propertyIndex, value),
-                invalidPart = invalidPartForLessThan(propertyIndex ,value)
-            )
-        } else {
-            Rule(
-                value = value,
-                workflow = workflow,
-                propertyIndex = propertyIndex,
-                isValid = partGreaterThanRule(propertyIndex, value),
-                isPotentialPart = potentialPartGreaterThanRule(propertyIndex, value),
-                validPart = potentialPartForGreaterThan(propertyIndex, value),
-                invalidPart = invalidPartForGreaterThan(propertyIndex ,value)
-            )
-        }
-    } else {
-        Rule(0, workflow, 0, { true },{true},{ p -> p},{ p -> p} )
-    }
-}
+fun String.toRule() =
+    if (!containsAConditon()) Rule(0, workflow, 0, {true},{ p -> p},{ p -> p} )
+    else Rule(
+        value = value,
+        workflow = workflow,
+        propertyIndex = propertyIndex,
+        isPotentialPart = if (get(1) == '<') potentialPartLessThanRule(propertyIndex, value) else potentialPartGreaterThanRule(propertyIndex, value),
+        validPart = if (get(1) == '<') potentialPartForLessThan(propertyIndex, value) else potentialPartForGreaterThan(propertyIndex, value),
+        invalidPart = if (get(1) == '<') invalidPartForLessThan(propertyIndex ,value) else invalidPartForGreaterThan(propertyIndex ,value)
+    )
 
 fun String.containsAConditon() = (length > 1 && listOf('<','>').any{it == get(1)})
-val String.propertyIndex get() = listOf('x', 'm', 'a', 's').indexOfFirst { it == first() }
 val String.value get() = drop(2).split(":").first().toInt()
-
-fun partLessThanRule(propertyIndex:Int, value:Int) = { part:Part -> part.properties[propertyIndex] < value }
-
-fun partGreaterThanRule(propertyIndex:Int, value:Int) = { part:Part -> part.properties[propertyIndex] > value }
+val String.workflow get() = split(":").last()
+val String.propertyIndex get() = listOf('x', 'm', 'a', 's').indexOfFirst { it == first() }
 
 fun potentialPartLessThanRule(propertyIndex:Int, value:Int) = { part:PotentialPart -> part.minProperties[propertyIndex] < value }
 
@@ -86,20 +66,15 @@ fun invalidPartForGreaterThan(propertyIndex:Int, value:Int) =
 
 fun List<Int>.replaceValueAt(index:Int, new:Int) = mapIndexed { i, v -> if(i == index ) new else v }
 
-fun String.partNos() = removePrefix("{").removeSuffix("}").split(",").map{it.split("=").last().toInt()}
-
 fun partTwo(sampleData:List<String>):Long {
     val workflows = sampleData.toWorkFlows()
-    val results = PotentialPart().findParts("in", workflows)
-    return results.sumOf {result->
-        (result.maxProperties[0] - result.minProperties[0] + 1).toLong() *
-                (result.maxProperties[1] - result.minProperties[1] + 1).toLong() *
-                (result.maxProperties[2] - result.minProperties[2] + 1).toLong() *
-                (result.maxProperties[3] - result.minProperties[3] + 1).toLong()
-    }
+    return PotentialPart().findParts("in", workflows).ratings()
 }
 
-data class PotentialPart(val minProperties:List<Int> = listOf(1,1,1,1), val maxProperties:List<Int> = listOf(4000,4000, 4000,4000))
+fun List<PotentialPart>.ratings() = sumOf {part ->
+    part.maxProperties.mapIndexed {i, maxProperties -> (maxProperties - part.minProperties[i] + 1).toLong()}
+        .fold(1L){a, v -> a * v}
+}
 
 fun PotentialPart.findParts(workflowId: String, workFlows: Map<String, List<Rule>>):List<PotentialPart> {
     if (workflowId == "A") return listOf(this)

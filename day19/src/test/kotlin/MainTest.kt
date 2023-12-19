@@ -23,7 +23,7 @@ class MainTest:WordSpec({
     """.trimIndent().split("\n")
     "part one" should ({
         "parse string into a Part" {
-            "{x=787,m=2655,a=1222,s=2876}".toPart() shouldBe Part(listOf(787,2655,1222,2876))
+            "{x=787,m=2655,a=1222,s=2876}".toPart() shouldBe PotentialPart(listOf(787,2655,1222,2876), listOf(787,2655,1222,2876))
         }
         "parse string into a list of rules" {
             val rules = "px{a<2006:qkq,m>2090:A,rfg}".toRules()
