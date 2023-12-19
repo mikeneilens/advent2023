@@ -68,21 +68,23 @@ fun potentialPartGreaterThanRule(propertyIndex:Int, value:Int) = { part:Potentia
 
 fun potentialPartForLessThan(propertyIndex:Int, value:Int) =
     { part:PotentialPart ->
-        if (part.maxProperties[propertyIndex] >= value) part.copy(maxProperties = part.maxProperties.mapIndexed{ i, p -> if (i == propertyIndex) value -1 else p  })
+        if (part.maxProperties[propertyIndex] >= value) part.copy(maxProperties = part.maxProperties.replaceValueAt(propertyIndex, value - 1))
         else part}
 
 fun potentialPartForGreaterThan(propertyIndex:Int, value:Int) =
     { part:PotentialPart ->
-        if(part.minProperties[propertyIndex] <= value) part.copy(minProperties = part.minProperties.mapIndexed{ i, p -> if (i == propertyIndex) value +1 else p  })
+        if(part.minProperties[propertyIndex] <= value) part.copy(minProperties = part.minProperties.replaceValueAt(propertyIndex, value + 1))
         else part}
 
 fun invalidPartForLessThan(propertyIndex:Int, value:Int) =
     { part:PotentialPart ->
-        part.copy(minProperties = part.minProperties.mapIndexed{ i, p -> if (i == propertyIndex) maxOf(p, value) else p  })  }
+        part.copy(minProperties = part.minProperties.replaceValueAt(propertyIndex, maxOf(part.minProperties[propertyIndex], value)))}
 
 fun invalidPartForGreaterThan(propertyIndex:Int, value:Int) =
     { part:PotentialPart ->
-        part.copy(maxProperties = part.maxProperties.mapIndexed{ i, p -> if (i == propertyIndex) minOf(p, value) else p  })  }
+        part.copy(maxProperties = part.maxProperties.replaceValueAt(propertyIndex, minOf(part.maxProperties[propertyIndex], value)))}
+
+fun List<Int>.replaceValueAt(index:Int, new:Int) = mapIndexed { i, v -> if(i == index ) new else v }
 
 fun String.partNos() = removePrefix("{").removeSuffix("}").split(",").map{it.split("=").last().toInt()}
 
