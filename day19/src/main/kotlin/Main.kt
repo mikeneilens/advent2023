@@ -72,8 +72,7 @@ fun partTwo(sampleData:List<String>):Long {
 }
 
 fun List<PotentialPart>.ratings() = sumOf {part ->
-    part.maxProperties.mapIndexed {i, maxProperties -> (maxProperties - part.minProperties[i] + 1).toLong()}
-        .fold(1L){a, v -> a * v}
+    part.maxProperties.mapIndexed {i, maxProperties -> (maxProperties - part.minProperties[i] + 1).toLong()}.reduce(Long::times)
 }
 
 fun PotentialPart.findParts(workflowId: String, workFlows: Map<String, List<Rule>>):List<PotentialPart> {
