@@ -21,13 +21,13 @@ fun String.partNos() = removePrefix("{").removeSuffix("}").split(",").map{it.spl
 
 data class Rule(val value:Int, val workflow:String, val propertyIndex:Int, val isPotentialPart:(PotentialPart)->Boolean, val validPart:(PotentialPart)->PotentialPart, val invalidPart:(PotentialPart)->PotentialPart)
 
-fun List<String>.toWorkFlows() = joinToString("\n").split("\n\n")[0].split("\n")
-    .map{ s -> Pair( s.split("{").first(), s.toRules()) }.toMap()
+fun List<String>.toWorkFlows() =
+    joinToString("\n").split("\n\n")[0].split("\n").associate { s -> Pair(s.split("{").first(), s.toRules()) }
 
 fun String.toRules() = split("{")[1].removeSuffix("}").split(",").map { it.toRule() }
 
 fun String.toRule() =
-    if (!containsAConditon()) Rule(0, workflow, 0, {true},{ p -> p},{ p -> p} )
+    if (!containsACondition()) Rule(0, workflow, 0, {true},{ p -> p},{ p -> p} )
     else Rule(
         value = value,
         workflow = workflow,
@@ -37,7 +37,7 @@ fun String.toRule() =
         invalidPart = if (get(1) == '<') invalidPartForLessThan(propertyIndex ,value) else invalidPartForGreaterThan(propertyIndex ,value)
     )
 
-fun String.containsAConditon() = (length > 1 && listOf('<','>').any{it == get(1)})
+fun String.containsACondition() = (length > 1 && listOf('<','>').any{it == get(1)})
 val String.value get() = drop(2).split(":").first().toInt()
 val String.workflow get() = split(":").last()
 val String.propertyIndex get() = listOf('x', 'm', 'a', 's').indexOfFirst { it == first() }
