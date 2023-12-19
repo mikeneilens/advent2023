@@ -21,7 +21,7 @@ fun List<String>.toWorkFlows() = joinToString("\n").split("\n\n")[0].split("\n")
 
 fun String.toPart() = Part(partNos())
 
-data class Rule(val value:Int, val workflow:String, val propertyIndex:Int, val isValid:(Part)->Boolean, val isRange:(PotentialPart)->Boolean, val validPart:(PotentialPart)->PotentialPart, val invalidPart:(PotentialPart)->PotentialPart)
+data class Rule(val value:Int, val workflow:String, val propertyIndex:Int, val isValid:(Part)->Boolean, val isPotentialPart:(PotentialPart)->Boolean, val validPart:(PotentialPart)->PotentialPart, val invalidPart:(PotentialPart)->PotentialPart)
 
 fun String.toRules() = split("{")[1].removeSuffix("}").split(",").map { it.toRule() }
 
@@ -34,7 +34,7 @@ fun String.toRule():Rule {
                 workflow = workflow,
                 propertyIndex = propertyIndex,
                 isValid = partLessThanRule(propertyIndex, value),
-                isRange = potentialPartLessThanRule(propertyIndex, value),
+                isPotentialPart = potentialPartLessThanRule(propertyIndex, value),
                 validPart = potentialPartForLessThan(propertyIndex, value),
                 invalidPart = invalidPartForLessThan(propertyIndex ,value)
             )
@@ -44,7 +44,7 @@ fun String.toRule():Rule {
                 workflow = workflow,
                 propertyIndex = propertyIndex,
                 isValid = partGreaterThanRule(propertyIndex, value),
-                isRange = potentialPartGreaterThanRule(propertyIndex, value),
+                isPotentialPart = potentialPartGreaterThanRule(propertyIndex, value),
                 validPart = potentialPartForGreaterThan(propertyIndex, value),
                 invalidPart = invalidPartForGreaterThan(propertyIndex ,value)
             )
@@ -107,7 +107,7 @@ fun PotentialPart.findParts(workflowId: String, workFlows: Map<String, List<Rule
     val rules = workFlows.getValue(workflowId)
 
     val outputs = rules.fold(Pair(this, listOf<Pair<PotentialPart, String>>())){ (part, output), rule ->
-        if (rule.isRange(part)) Pair(rule.invalidPart(part), output + listOf(Pair(rule.validPart(part), rule.workflow)))
+        if (rule.isPotentialPart(part)) Pair(rule.invalidPart(part), output + listOf(Pair(rule.validPart(part), rule.workflow)))
         else Pair(rule.invalidPart(part), output)
     }.second
 
