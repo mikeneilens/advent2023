@@ -23,14 +23,16 @@ class MainTest:WordSpec({
     """.trimIndent().split("\n")
     "part one" should ({
         "parse string into a Part" {
-            "{x=787,m=2655,a=1222,s=2876}".toPart() shouldBe Part(x=787,m=2655,a=1222,s=2876)
+            "{x=787,m=2655,a=1222,s=2876}".toPart() shouldBe Part(listOf(787,2655,1222,2876))
         }
         "parse string into a list of rules" {
-            "px{a<2006:qkq,m>2090:A,rfg}".toRules() shouldBe listOf(
-                ALessThan(value = 2006, workflow = "qkq"),
-                MGreaterThan(value = 2090, workflow = "A"),
-                Default(value = 0, workflow = "rfg"),
-                )
+            val rules = "px{a<2006:qkq,m>2090:A,rfg}".toRules()
+            rules[0].value shouldBe 2006
+            rules[0].workflow shouldBe "qkq"
+            rules[1].value shouldBe 2090
+            rules[1].workflow shouldBe "A"
+            rules[2].value shouldBe 0
+            rules[2].workflow shouldBe "rfg"
         }
         "parse test data into 11 workflows and 5 parts" {
             testData.toParts().size shouldBe 5
@@ -57,16 +59,14 @@ class MainTest:WordSpec({
         "find potential part for test data" {
             val workflows = testData.toWorkFlows()
             val results = PotentialPart().findParts("in", workflows)
-            results.forEach{result ->
-                println("${ (result.maxA - result.minA + 1).toLong() * (result.maxX - result.minX + 1) * (result.maxM - result.minM + 1) * (result.maxS - result.minS + 1)  }")
-            }
-            results.sumOf {result->
-                (result.maxA - result.minA + 1).toLong() *
-                        (result.maxX - result.minX + 1 ).toLong() *
-                        (result.maxM - result.minM  +1).toLong() *
-                        (result.maxS - result.minS + 1).toLong() } shouldBe 167409079868000L
+            results.sumOf{result->
+                (result.maxProperties[0] - result.minProperties[0] + 1).toLong() *
+                        (result.maxProperties[1] - result.minProperties[1] + 1).toLong() *
+                        (result.maxProperties[2] - result.minProperties[2] + 1).toLong() *
+                        (result.maxProperties[3] - result.minProperties[3] + 1).toLong()
+            } shouldBe 167409079868000L
         }
-        "part two should be 0" {
+        "part two should be 134343280273968L" {
             partTwo(sampleData) shouldBe 134343280273968L
         }
     })
