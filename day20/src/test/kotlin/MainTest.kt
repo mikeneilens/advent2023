@@ -37,8 +37,7 @@ class MainTest:WordSpec({
             module.inputs shouldBe listOf("c")
         }
         "update module map with test data" {
-            val modules = mutableMapOf<String, Module>()
-            testdata1.createModules(modules)
+            val modules = testdata1.createModules()
             val broadcaster =  modules["broadcaster"]
             val a = modules["a"]
             val b = modules["b"]
@@ -51,24 +50,13 @@ class MainTest:WordSpec({
             inv?.destinations shouldBe listOf("a")
         }
         "sending a low pulse to broadcast in testdata1" {
-            val modules = mutableMapOf<String,Module>()
-            testdata1.createModules(modules)
+            val modules = testdata1.createModules()
             modules["button"]?.send(Pulse.Low)
             val lowPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.Low }.size }
             val highPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.High }.size }
             lowPulseSent shouldBe 8
             highPulseSent shouldBe 4
             modules.forEach { println("${it.key} ${it.value.pulsesSent}") }
-        }
-        "sending a low pulse to broadcast in testdata2" {
-            val modules = mutableMapOf<String,Module>()
-            testdata2.createModules(modules)
-            modules["button"]?.send(Pulse.Low)
-//            val lowPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.Low }.size }
-//            val highPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.High }.size }
-//            lowPulseSent shouldBe 8
-//            highPulseSent shouldBe 4
-//            modules.forEach { println("${it.key} ${it.value.pulsesSent}") }
         }
         "part one with testdata1 should be 32000000L" {
             partOne(testdata1) shouldBe 32000000L

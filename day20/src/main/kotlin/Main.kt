@@ -1,7 +1,6 @@
 
 fun partOne(sampleData:List<String>) :Long {
-    val modules = mutableMapOf<String, Module>()
-    sampleData.createModules(modules)
+    val modules = sampleData.createModules()
     repeat(1000){modules["button"]?.send(Pulse.Low)}
     return countPulses(Pulse.Low, modules) * countPulses(Pulse.High, modules)
 }
@@ -9,7 +8,7 @@ fun partOne(sampleData:List<String>) :Long {
 private fun countPulses(pulseType:Pulse, modules: MutableMap<String, Module>) =
     modules.values.sumOf { it.pulsesSent.filter { it == pulseType }.size }.toLong()
 
-fun List<String>.createModules(modules:MutableMap<String, Module>):MutableMap<String, Module> {
+fun List<String>.createModules(modules:MutableMap<String, Module> = mutableMapOf()):MutableMap<String, Module> {
     filter(String::isBroadcaster).forEach { modules["broadcaster"] = it.toBroadcaster(modules) }
     filter(String::isFlipFlop).forEach { modules[it.moduleName] = it.toFlipFlop(modules) }
     filter(String::isConjunction).forEach { modules[it.moduleName] = it.toConjunction(modules) }
@@ -84,11 +83,10 @@ data class Conjunction(val inputs:List<String>, override val modules:Map<String,
 }
 
 fun partTwo(sampleData:List<String>):Long {
-    val modules = mutableMapOf<String, Module>()
-    val pressesForFT = buttonPressesToPulseHigh(sampleData.createModules(modules), "ft")
-    val pressesForJZ = buttonPressesToPulseHigh(sampleData.createModules(modules), "jz")
-    val pressesForSV = buttonPressesToPulseHigh(sampleData.createModules(modules), "sv")
-    val pressesForNG = buttonPressesToPulseHigh(sampleData.createModules(modules), "ng")
+    val pressesForFT = buttonPressesToPulseHigh(sampleData.createModules(), "ft")
+    val pressesForJZ = buttonPressesToPulseHigh(sampleData.createModules(), "jz")
+    val pressesForSV = buttonPressesToPulseHigh(sampleData.createModules(), "sv")
+    val pressesForNG = buttonPressesToPulseHigh(sampleData.createModules(), "ng")
     return lowestCommonMultiple(listOf( pressesForFT, pressesForJZ, pressesForNG, pressesForSV))
 }
 
