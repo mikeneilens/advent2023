@@ -76,13 +76,13 @@ class MainTest:WordSpec({
         "part one with testdata2 should be 11687500L" {
             partOne(testdata2) shouldBe 11687500L
         }
-        "part one with sample data should be 11687500L" {
-            partOne(sampleData) shouldBe 11687500L
+        "part one with sample data should be 788081152L" {
+            partOne(sampleData) shouldBe 788081152L
         }
     })
     "part two" should ({
-        "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+        "part two should be 224602011344203" {
+            partTwo(sampleData) shouldBe 224602011344203L
         }
     })
 })

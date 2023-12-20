@@ -3,17 +3,19 @@ fun partOne(sampleData:List<String>) :Long {
     val modules = mutableMapOf<String, Module>()
     sampleData.updateModules(modules)
     repeat(1000){modules["button"]?.send(Pulse.Low)}
-    val pulsesSent = Pair(modules.values.sumOf { it.pulsesSent.filter { it == Pulse.Low }.size }.toLong(),
-                          modules.values.sumOf { it.pulsesSent.filter { it == Pulse.High }.size }.toLong())
-    return pulsesSent.first * pulsesSent.second
+    return countPulses(Pulse.Low, modules) * countPulses(Pulse.High, modules)
 }
 
-fun List<String>.updateModules(modules:MutableMap<String, Module>) {
+private fun countPulses(pulseType:Pulse, modules: MutableMap<String, Module>) =
+    modules.values.sumOf { it.pulsesSent.filter { it == pulseType }.size }.toLong()
+
+fun List<String>.updateModules(modules:MutableMap<String, Module>):MutableMap<String, Module> {
     filter(String::isBroadcaster).forEach { modules["broadcaster"] = it.toBroadcaster(modules) }
-    filter(String::isFlipFlop).forEach { modules[it.flipFlopName] = it.toFlipFlop(modules) }
-    filter(String::isConjunction).forEach { modules[it.conjunctionName] = it.toConjunction(modules) }
-    filter(String::isConjunction).forEach { modules[it.conjunctionName] = it.toConjunction(modules) }
+    filter(String::isFlipFlop).forEach { modules[it.moduleName] = it.toFlipFlop(modules) }
+    filter(String::isConjunction).forEach { modules[it.moduleName] = it.toConjunction(modules) }
+    filter(String::isConjunction).forEach { modules[it.moduleName] = it.toConjunction(modules) }
     modules["button"] = Button(modules, listOf("broadcaster"))
+    return modules
 }
 
 fun String.isBroadcaster() = startsWith("broad")
@@ -25,10 +27,9 @@ fun String.toBroadcaster(modules:MutableMap<String, Module>) = Broadcaster(modul
 fun String.toFlipFlop(modules:MutableMap<String, Module>) = FlipFlop(modules = modules, destinations =  destinations)
 
 fun String.toConjunction(modules:MutableMap<String, Module>) =
-    Conjunction(modules.withDestinationOf(conjunctionName), modules, destinations)
+    Conjunction(modules.withDestinationOf(moduleName), modules, destinations)
 
-val String.conjunctionName get() = drop(1).split(" -> ")[0]
-val String.flipFlopName get() = drop(1).split(" -> ")[0]
+val String.moduleName get() = drop(1).split(" -> ")[0]
 val String.destinations get() = split(" -> ")[1].split(", ")
 
 fun MutableMap<String, Module>.withDestinationOf(s:String) = filter { (_, value) -> value.destinations.contains(s) }.keys.toList()
@@ -42,22 +43,19 @@ interface Module {
     val pulsesSent:MutableList<Pulse>
 
     fun receive(pulse:Pulse)
-    fun send(pulse:Pulse) {
-        destinations.forEach {pulsesSent.add(pulse); modules[it]?.receive(pulse) }
-    }
+
+    fun send(pulse:Pulse) = destinations.forEach {pulsesSent.add(pulse); modules[it]?.receive(pulse) }
 }
 
 data class Button(override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
-    override fun receive(pulse: Pulse) {
-        send(pulse)
-    }
+    override fun receive(pulse: Pulse) = send(pulse)
+
     override fun toString() = "Button( destinations = $destinations pulsesSent = $pulsesSent)"
 }
 
 data class Broadcaster(override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
-    override fun receive(pulse: Pulse) {
-        send(pulse)
-    }
+    override fun receive(pulse: Pulse) = send(pulse)
+
     override fun toString() = "Broadcaster( destinations = $destinations pulsesSent = $pulsesSent)"
 }
 
@@ -88,23 +86,18 @@ data class Conjunction(val inputs:List<String>, override val modules:Map<String,
 fun partTwo(sampleData:List<String>):Long {
     val modules = mutableMapOf<String, Module>()
     sampleData.updateModules(modules)
-    val pressesForFT = buttonPressesToPulseHigh(modules, "ft")
-    val pressesForJZ = buttonPressesToPulseHigh(modules, "jz")
-    val pressesForSV = buttonPressesToPulseHigh(modules, "sv")
-    val pressesForNG = buttonPressesToPulseHigh(modules, "ng")
-
+    val pressesForFT = buttonPressesToPulseHigh(sampleData.updateModules(modules), "ft")
+    val pressesForJZ = buttonPressesToPulseHigh(sampleData.updateModules(modules), "jz")
+    val pressesForSV = buttonPressesToPulseHigh(sampleData.updateModules(modules), "sv")
+    val pressesForNG = buttonPressesToPulseHigh(sampleData.updateModules(modules), "ng")
     return lowestCommonMultiple(listOf( pressesForFT, pressesForJZ, pressesForNG, pressesForSV))
 }
 
-fun buttonPressesToPulseHigh(modules:MutableMap<String, Module>,module:String):Long {
-    sampleData.updateModules(modules)
-    var count = 0
-    while ( Pulse.High !in  (modules[module]?.pulsesSent ?: listOf())) {
+fun buttonPressesToPulseHigh(modules:MutableMap<String, Module>,module:String) =
+     (1..100000L).first {
         modules["button"]?.send(Pulse.Low)
-        count++
+        Pulse.High in (modules[module]?.pulsesSent ?: listOf())
     }
-    return count.toLong()
-}
 
 fun lowestCommonMultiple(numbers: List<Long>): Long =
     numbers.fold(1L) { x, y -> x * (y / greatestCommonDenominator(x, y)) }
