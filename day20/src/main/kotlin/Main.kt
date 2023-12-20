@@ -78,7 +78,7 @@ data class FlipFlop(var status:Status = Status.Off, override val modules:Map<Str
 
 data class Conjunction(val inputs:List<String>, override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
     override fun receive(pulse: Pulse) {
-        if (inputs.isNotEmpty() && inputs.all{moduleName -> modules[moduleName]?.lastPulseSent() == Pulse.High})
+        if (inputs.all{moduleName -> modules[moduleName]?.lastPulseSent() == Pulse.High})
             send(Pulse.Low)
         else
             send(Pulse.High)
