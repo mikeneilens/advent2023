@@ -44,6 +44,8 @@ interface Module {
     fun receive(pulse:Pulse)
 
     fun send(pulse:Pulse) = destinations.forEach {pulsesSent.add(pulse); modules[it]?.receive(pulse) }
+
+    fun lastPulseSent() = if (pulsesSent.size == 0) null else pulsesSent.last()
 }
 
 data class Button(override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
@@ -74,7 +76,7 @@ data class FlipFlop(var status:Status = Status.Off, override val modules:Map<Str
 
 data class Conjunction(val inputs:List<String>, override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
     override fun receive(pulse: Pulse) {
-        if (inputs.isNotEmpty() && inputs.all{s -> if(modules[s]?.pulsesSent?.size == 0) false else modules[s]?.pulsesSent?.last() == Pulse.High})
+        if (inputs.isNotEmpty() && inputs.all{moduleName -> modules[moduleName]?.lastPulseSent() == Pulse.High})
             send(Pulse.Low)
         else
             send(Pulse.High)
@@ -90,10 +92,10 @@ fun partTwo(sampleData:List<String>):Long {
     return lowestCommonMultiple(listOf( pressesForFT, pressesForJZ, pressesForNG, pressesForSV))
 }
 
-fun buttonPressesToPulseHigh(modules:Map<String, Module>,module:String) =
+fun buttonPressesToPulseHigh(modules:Map<String, Module>, moduleName:String) =
      (1..100000L).first {
         modules["button"]?.send(Pulse.Low)
-        Pulse.High in (modules[module]?.pulsesSent ?: listOf())
+        Pulse.High in modules.getValue(moduleName).pulsesSent
     }
 
 fun lowestCommonMultiple(numbers: List<Long>): Long =
