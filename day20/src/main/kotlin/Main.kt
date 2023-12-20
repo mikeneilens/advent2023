@@ -1,7 +1,7 @@
 
 fun partOne(sampleData:List<String>) :Long {
     val modules = mutableMapOf<String, Module>()
-    sampleData.updateModules(modules)
+    sampleData.createModules(modules)
     repeat(1000){modules["button"]?.send(Pulse.Low)}
     return countPulses(Pulse.Low, modules) * countPulses(Pulse.High, modules)
 }
@@ -9,7 +9,7 @@ fun partOne(sampleData:List<String>) :Long {
 private fun countPulses(pulseType:Pulse, modules: MutableMap<String, Module>) =
     modules.values.sumOf { it.pulsesSent.filter { it == pulseType }.size }.toLong()
 
-fun List<String>.updateModules(modules:MutableMap<String, Module>):MutableMap<String, Module> {
+fun List<String>.createModules(modules:MutableMap<String, Module>):MutableMap<String, Module> {
     filter(String::isBroadcaster).forEach { modules["broadcaster"] = it.toBroadcaster(modules) }
     filter(String::isFlipFlop).forEach { modules[it.moduleName] = it.toFlipFlop(modules) }
     filter(String::isConjunction).forEach { modules[it.moduleName] = it.toConjunction(modules) }
@@ -85,11 +85,10 @@ data class Conjunction(val inputs:List<String>, override val modules:Map<String,
 
 fun partTwo(sampleData:List<String>):Long {
     val modules = mutableMapOf<String, Module>()
-    sampleData.updateModules(modules)
-    val pressesForFT = buttonPressesToPulseHigh(sampleData.updateModules(modules), "ft")
-    val pressesForJZ = buttonPressesToPulseHigh(sampleData.updateModules(modules), "jz")
-    val pressesForSV = buttonPressesToPulseHigh(sampleData.updateModules(modules), "sv")
-    val pressesForNG = buttonPressesToPulseHigh(sampleData.updateModules(modules), "ng")
+    val pressesForFT = buttonPressesToPulseHigh(sampleData.createModules(modules), "ft")
+    val pressesForJZ = buttonPressesToPulseHigh(sampleData.createModules(modules), "jz")
+    val pressesForSV = buttonPressesToPulseHigh(sampleData.createModules(modules), "sv")
+    val pressesForNG = buttonPressesToPulseHigh(sampleData.createModules(modules), "ng")
     return lowestCommonMultiple(listOf( pressesForFT, pressesForJZ, pressesForNG, pressesForSV))
 }
 

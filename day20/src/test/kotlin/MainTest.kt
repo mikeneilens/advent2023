@@ -38,7 +38,7 @@ class MainTest:WordSpec({
         }
         "update module map with test data" {
             val modules = mutableMapOf<String, Module>()
-            testdata1.updateModules(modules)
+            testdata1.createModules(modules)
             val broadcaster =  modules["broadcaster"]
             val a = modules["a"]
             val b = modules["b"]
@@ -52,7 +52,7 @@ class MainTest:WordSpec({
         }
         "sending a low pulse to broadcast in testdata1" {
             val modules = mutableMapOf<String,Module>()
-            testdata1.updateModules(modules)
+            testdata1.createModules(modules)
             modules["button"]?.send(Pulse.Low)
             val lowPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.Low }.size }
             val highPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.High }.size }
@@ -62,7 +62,7 @@ class MainTest:WordSpec({
         }
         "sending a low pulse to broadcast in testdata2" {
             val modules = mutableMapOf<String,Module>()
-            testdata2.updateModules(modules)
+            testdata2.createModules(modules)
             modules["button"]?.send(Pulse.Low)
 //            val lowPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.Low }.size }
 //            val highPulseSent =  modules.values.sumOf { it.pulsesSent.filter { it == Pulse.High }.size }
