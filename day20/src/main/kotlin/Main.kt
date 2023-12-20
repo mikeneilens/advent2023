@@ -5,10 +5,10 @@ fun partOne(sampleData:List<String>) :Long {
     return countPulses(Pulse.Low, modules) * countPulses(Pulse.High, modules)
 }
 
-private fun countPulses(pulseType:Pulse, modules: MutableMap<String, Module>) =
+private fun countPulses(pulseType:Pulse, modules: Map<String, Module>) =
     modules.values.sumOf { it.pulsesSent.filter { it == pulseType }.size }.toLong()
 
-fun List<String>.createModules(modules:MutableMap<String, Module> = mutableMapOf()):MutableMap<String, Module> {
+fun List<String>.createModules(modules:MutableMap<String, Module> = mutableMapOf()):Map<String, Module> {
     filter(String::isBroadcaster).forEach { modules["broadcaster"] = it.toBroadcaster(modules) }
     filter(String::isFlipFlop).forEach { modules[it.moduleName] = it.toFlipFlop(modules) }
     filter(String::isConjunction).forEach { modules[it.moduleName] = it.toConjunction(modules) }
@@ -90,7 +90,7 @@ fun partTwo(sampleData:List<String>):Long {
     return lowestCommonMultiple(listOf( pressesForFT, pressesForJZ, pressesForNG, pressesForSV))
 }
 
-fun buttonPressesToPulseHigh(modules:MutableMap<String, Module>,module:String) =
+fun buttonPressesToPulseHigh(modules:Map<String, Module>,module:String) =
      (1..100000L).first {
         modules["button"]?.send(Pulse.Low)
         Pulse.High in (modules[module]?.pulsesSent ?: listOf())
