@@ -45,7 +45,9 @@ interface Module {
 
     fun send(pulse:Pulse) = destinations.forEach {pulsesSent.add(pulse); modules[it]?.receive(pulse) }
 
-    fun lastPulseSent() = if (pulsesSent.size == 0) null else pulsesSent.last()
+    fun lastPulseSent() = pulsesSent.lastOrNull()
+
+    fun pulsesSentInclude(pulse:Pulse) = pulsesSent.contains(pulse)
 }
 
 data class Button(override val modules:Map<String, Module>, override val destinations:List<String>, override val pulsesSent:MutableList<Pulse> = mutableListOf()):Module {
@@ -95,7 +97,7 @@ fun partTwo(sampleData:List<String>):Long {
 fun buttonPressesToPulseHigh(modules:Map<String, Module>, moduleName:String) =
      (1..100000L).first {
         modules["button"]?.send(Pulse.Low)
-        Pulse.High in modules.getValue(moduleName).pulsesSent
+        modules.getValue(moduleName).pulsesSentInclude(Pulse.High)
     }
 
 fun lowestCommonMultiple(numbers: List<Long>): Long =
