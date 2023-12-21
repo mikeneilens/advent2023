@@ -43,22 +43,22 @@ fun partTwo(sampleData:List<String>):Long {
     val odd = ((gridWidth / 2) * 2 + 1).toDouble().pow(2).toLong()
     val even = (((gridWidth + 1) / 2) * 2).toDouble().pow(2).toLong()
 
-    return odd * map.oddSteps(size, positionOfS) +
-            even * map.evenSteps(size, positionOfS) +
-            map.stepsInCorners(size, positionOfS) +
-            (gridWidth + 1) * map.stepsInSmallEdges(size) +
-            gridWidth * map.stepsInLargeEdges(size)
+    return odd * map.oddGardens(size, positionOfS) +
+            even * map.evenGardens(size, positionOfS) +
+            map.gardensInCorners(size, positionOfS) +
+            (gridWidth + 1) * map.gardensInSmallEdges(size) +
+            gridWidth * map.gardensInLargeEdges(size)
 }
 
-fun Set<Position>.oddSteps(size: Int, s: Position) = walk(s, size * 2 + 1 )
+fun Set<Position>.oddGardens(size: Int, s: Position) = walk(s, size * 2 + 1 )
 
-fun Set<Position>.evenSteps(size: Int, s: Position) = walk(s, size * 2  )
+fun Set<Position>.evenGardens(size: Int, s: Position) = walk(s, size * 2  )
 
-fun  Set<Position>.stepsInCorners(size: Int, s: Position) =
+fun  Set<Position>.gardensInCorners(size: Int, s: Position) =
         listOf(Position(size - 1, s.col), Position(s.row, 0), Position(0, s.col), Position(s.row, size - 1)).sumOf { walk(it, size - 1) }
 
-fun  Set<Position>.stepsInSmallEdges(size: Int) =
+fun  Set<Position>.gardensInSmallEdges(size: Int) =
     listOf(Position(size - 1 , 0),Position(size - 1 , size - 1),Position(0 , 0),Position(0 , size -1 )).sumOf{walk(it,size/2 - 1)}
 
-fun  Set<Position>.stepsInLargeEdges(size: Int) =
+fun  Set<Position>.gardensInLargeEdges(size: Int) =
     listOf(Position(size - 1, 0), Position(size - 1, size - 1), Position(0, 0), Position(0, size - 1)).sumOf { walk(it, size * 3 / 2 - 1) }
