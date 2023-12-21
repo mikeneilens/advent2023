@@ -1,6 +1,6 @@
 import kotlin.math.pow
 
-data class Position(val row:Long, val col:Long) {
+data class Position(val row:Int, val col:Int) {
     operator fun plus(other:Position) = Position(row + other.row, col + other.col)
 
     fun surroundingPositions(map:Set<Position>) = offsets.map{offset -> this + offset}.filter { it.isOn(map) }
@@ -12,22 +12,22 @@ data class Position(val row:Long, val col:Long) {
     }
 }
 
-fun partOne(sampleData:List<String>) :Long {
+fun partOne(sampleData:List<String>) :Int {
     val positionOfS = sampleData.positionOfS()
     val map = sampleData.createMap()
-    return map.walk(positionOfS, 64).toLong()
+    return map.walk(positionOfS, 64)
 }
 
-fun List<String>.positionOfS(n:Long = 0) = Position( n * size + size/2, n * size + size/2)
+fun List<String>.positionOfS(n:Int = 0) = Position( n * size + size/2, n * size + size/2)
 
 fun List<String>.createMap():Set<Position> =
     flatMapIndexed { row, string -> string.mapIndexed {col, char ->
-            if (char in listOf('.','S')) Position(row.toLong(), col.toLong()) else null
+            if (char in listOf('.','S')) Position(row, col) else null
         } }.filterNotNull().toSet()
 
-fun  Set<Position>.walk(position:Position, maxSteps:Long) = walk(listOf(position),0, maxSteps, this).size
+fun  Set<Position>.walk(position:Position, maxSteps:Int) = walk(listOf(position),0, maxSteps, this).size
 
-tailrec fun walk(positions:List<Position>, steps:Long, maxSteps:Long, map:Set<Position>):List<Position> {
+tailrec fun walk(positions:List<Position>, steps:Int, maxSteps:Int, map:Set<Position>):List<Position> {
     if (steps == maxSteps) return positions
     val newPositions = positions.flatMap { position -> position.surroundingPositions(map) }.distinct()
     return walk(newPositions, steps + 1, maxSteps, map)
@@ -36,7 +36,7 @@ tailrec fun walk(positions:List<Position>, steps:Long, maxSteps:Long, map:Set<Po
 fun partTwo(sampleData:List<String>):Long {
     val map = sampleData.createMap()
     val steps = 26501365L
-    val size = sampleData.size.toLong()
+    val size = sampleData.size
     val gridWidth = steps / size - 1
     val positionOfS = sampleData.positionOfS()
 
@@ -50,15 +50,15 @@ fun partTwo(sampleData:List<String>):Long {
             gridWidth * map.stepsInLargeEdges(size)
 }
 
-fun Set<Position>.oddSteps(size: Long, s: Position) = walk(s, size * 2 + 1 )
+fun Set<Position>.oddSteps(size: Int, s: Position) = walk(s, size * 2 + 1 )
 
-fun Set<Position>.evenSteps(size: Long, s: Position) = walk(s, size * 2  )
+fun Set<Position>.evenSteps(size: Int, s: Position) = walk(s, size * 2  )
 
-fun  Set<Position>.stepsInCorners(size: Long, s: Position) =
-        listOf(Position(size - 1, s.col), Position(s.row, 0), Position(0, s.col), Position(s.row, size - 1)).map { walk(it, size - 1) }.sum()
+fun  Set<Position>.stepsInCorners(size: Int, s: Position) =
+        listOf(Position(size - 1, s.col), Position(s.row, 0), Position(0, s.col), Position(s.row, size - 1)).sumOf { walk(it, size - 1) }
 
-fun  Set<Position>.stepsInSmallEdges(size: Long) =
-    listOf(Position(size - 1 , 0),Position(size - 1 , size - 1),Position(0 , 0),Position(0 , size -1 )).map{walk(it,size/2 - 1)}.sum()
+fun  Set<Position>.stepsInSmallEdges(size: Int) =
+    listOf(Position(size - 1 , 0),Position(size - 1 , size - 1),Position(0 , 0),Position(0 , size -1 )).sumOf{walk(it,size/2 - 1)}
 
-fun  Set<Position>.stepsInLargeEdges(size: Long) =
-    listOf(Position(size -1  , 0 ),Position(size -1  , size -1 ),Position(0  , 0 ),Position(0  , size -1  )).map{walk(it,size * 3 /2 - 1)}.sum()
+fun  Set<Position>.stepsInLargeEdges(size: Int) =
+    listOf(Position(size - 1, 0), Position(size - 1, size - 1), Position(0, 0), Position(0, size - 1)).sumOf { walk(it, size * 3 / 2 - 1) }
