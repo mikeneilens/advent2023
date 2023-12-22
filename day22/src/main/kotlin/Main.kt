@@ -45,7 +45,7 @@ fun List<Brick>.dropBricks(pile:List<Brick> = listOf(floor)):List<Brick> {
 }
 
 fun partTwo(sampleData:List<String>):Int {
-    val pile = sampleData.toBricks().dropBricks()
+    val pile = sampleData.toBricks().sortedBy { it.zRange.first }.dropBricks()
     return removeBricks(pile)
 }
 
