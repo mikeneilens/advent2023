@@ -96,8 +96,8 @@ class MainTest:WordSpec({
     "part two" should ({
         "test " {
             val pile = testdata1.toBricks().dropBricks()
-            val bricksRestingOnBricks = bricksRestingOnBricks(pile).toMutableMap()
-            bricksRestingOnBricks.remove1(pile[1])
+            val bricksRestingOnBricks = bricksRestingOnBricks(pile).map{Pair(it.key, it.value.toMutableList())}.toMap().toMutableMap()
+            bricksRestingOnBricks.removeBrick(pile[1])
             pile.size - bricksRestingOnBricks.size shouldBe 7
         }
         "part two with testdata should be 7" {
