@@ -69,5 +69,4 @@ fun removeBricks(pile:List<Brick>):Int {
 fun bricksRestingOnBricks(pile:List<Brick>) =
     pile.associateWith { brick -> brick.bricksBelow(pile).toMutableList() }
 
-
 infix fun IntRange.overlaps(other:IntRange) = last in other || other.last in this
