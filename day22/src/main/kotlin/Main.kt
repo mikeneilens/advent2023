@@ -23,7 +23,7 @@ data class Brick(val xRange:IntRange, val yRange:IntRange, val zRange:IntRange) 
         pile.filter{zRange.first == it.zRange.last + 1 && it.floorOverlaps(this) && it !in removedBricks}
 
     fun canBeRemovedFrom(pile:List<Brick>) =
-        bricksAbove(pile).none{brickAbove -> brickAbove.bricksBelow(pile.filter{it!= this}).isEmpty() }
+        bricksAbove(pile).all{brickAbove -> brickAbove.bricksBelow(pile).size > 1 }
 }
 
 fun List<Brick>.dropBricks(pile:List<Brick> = listOf(floor)):List<Brick> =
