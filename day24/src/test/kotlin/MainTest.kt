@@ -31,7 +31,7 @@ class MainTest:WordSpec({
         "Hailstone A: 18, 19, 22 @ -1, -1, -2, Hailstone B: 20, 25, 34 @ -2, -2, -4 are parallel so never cross" {
             val hailstoneA = "18, 19, 22 @ -1, -1, -2".toHailstone()
             val hailstoneB = "20, 25, 34 @ -2, -2, -4".toHailstone()
-            hailstoneA.isParallelWith(hailstoneB) shouldBe true
+            hailstoneA.notParallelWith(hailstoneB) shouldBe false
         }
         "Hailstone A: 19, 13, 30 @ -2, 1, -2, Hailstone B: 20, 25, 34 @ -2, -2, -4 intersect inside the test ara" {
             val hailstoneA = "19, 13, 30 @ -2, 1, -2".toHailstone()
