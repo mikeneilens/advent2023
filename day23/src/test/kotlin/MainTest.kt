@@ -77,11 +77,9 @@ class MainTest:WordSpec({
             paths.maxOf{ it.sumOf { it.second } } shouldBe 154
         }
         "part two with test data should be 154" {
-            max = 0
             partTwo(testdata) shouldBe 154
         }
         "part two should be 0" {
-            max = 0
             partTwo(sampleData) shouldBe 6658
         }
     })

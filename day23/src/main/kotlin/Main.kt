@@ -44,16 +44,16 @@ fun partTwo(sampleData:List<String>):Int {
     return paths.maxOf{ it.sumOf { it.second } }
 }
 
-var max = 0
+class Best(var value:Int = 0)
 
-fun Position.findPath2(connections:Map<Position, List<Pair<Position,Int>>>, endPosition:Position, visited:Set<Pair<Position,Int>>, visitedPositions:Set<Position> ):List<Set<Pair<Position,Int>>> {
+fun Position.findPath2(connections:Map<Position, List<Pair<Position,Int>>>, endPosition:Position, visited:Set<Pair<Position,Int>>, visitedPositions:Set<Position>, best:Best = Best() ):List<Set<Pair<Position,Int>>> {
     if (this == endPosition) {
         val distance = visited.sumOf { it.second }
-        if (distance > max) { max = distance; println("end reaced $distance") }
+        if (distance > best.value) { best.value = distance; println("end reaced $distance") }
         return listOf(visited)
     }
     return connections.getValue(this).filter { it.first !in visitedPositions  }.flatMap{ pair ->
-        pair.first.findPath2(connections, endPosition, visited + pair, visitedPositions + pair.first )
+        pair.first.findPath2(connections, endPosition, visited + pair, visitedPositions + pair.first, best )
     }
 }
 
