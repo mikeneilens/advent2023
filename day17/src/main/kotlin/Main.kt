@@ -1,16 +1,18 @@
-fun partOne(sampleData:List<String>) :Int {
+import java.util.PriorityQueue
+
+fun partOne(sampleData:List<String>, stoppingDistance: Int = 0, maxSteps: Int = 3) :Int {
     val chart = sampleData.toChart()
-    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0)
+    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0, stoppingDistance, maxSteps)
     val visited = mutableSetOf<Bearing>()
     val end = Position(sampleData.first().lastIndex, sampleData.lastIndex)
-    return expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end)
+    return expandCrucibleQueueUntilEnd(PriorityQueue<Crucible>().apply{add(crucible)}, visited, chart, end)
 }
 
 typealias Chart = Map<Position, Int>
 
 fun List<String>.toChart() = flatMapIndexed{ row, s -> s.mapIndexed { col, c -> Pair(Position(col,row), c.toString().toInt())}}.toMap()
 
-data class Crucible(val bearing: Bearing, val heatLoss:Int, val stoppingDistance:Int = 0, val maxSteps:Int = 3) {
+data class Crucible(val bearing: Bearing, val heatLoss:Int, val stoppingDistance:Int = 0, val maxSteps:Int = 3):Comparable<Crucible> {
 
     fun validDirections(chart:Chart) = Direction.values()
         .filter{newDirection ->  (newDirection != Direction.None && newDirection.offset != bearing.direction.offset.reversed)
@@ -37,6 +39,8 @@ data class Crucible(val bearing: Bearing, val heatLoss:Int, val stoppingDistance
     fun newHeatLossFor(newDirection:Direction, chart:Chart) = heatLoss + chart.getValue(newPositionFor(newDirection))
 
     fun isAt(end:Position) = bearing.position == end && bearing.steps >= stoppingDistance
+
+    override fun compareTo(other: Crucible): Int = heatLoss - other.heatLoss
 }
 
 
@@ -57,30 +61,26 @@ enum class Direction(val offset:Position) {
     None(Position(row = 0, col = 0)),
 }
 
-fun expandCrucibleQueue(crucibleQueue:List<Crucible>, visited:MutableSet<Bearing>, chart:Chart):List<Crucible>  {
-    val crucible = crucibleQueue.first()
+fun expandCrucibleQueue(crucibleQueue:PriorityQueue<Crucible>, visited:MutableSet<Bearing>, chart:Chart):PriorityQueue<Crucible>  {
+    val crucible = crucibleQueue.remove()
     val newDirections = crucible.validDirections(chart)
-    val newCrucibles = newDirections.mapNotNull{ newDirection ->
+    newDirections.mapNotNull{ newDirection ->
         crucible.newCrucible(newDirection, visited, chart)
-    }
-    return (crucibleQueue.drop(1) + newCrucibles).sortedBy { it.heatLoss }
+    }.forEach { crucibleQueue.add(it) }
+    return crucibleQueue
 }
 
-tailrec fun expandCrucibleQueueUntilEnd(crucibleQueue: List<Crucible>, visited:MutableSet<Bearing>, chart:Chart, end:Position, stoppingDistance:Int = 0):Int {
+tailrec fun expandCrucibleQueueUntilEnd(crucibleQueue: PriorityQueue<Crucible>, visited:MutableSet<Bearing>, chart:Chart, end:Position, stoppingDistance:Int = 0):Int {
     if ( atEndOfSearch(crucibleQueue, end)) return crucibleQueue.firstOrNull()?.heatLoss ?:0
     val newCrucibleQueue = expandCrucibleQueue(crucibleQueue, visited, chart)
     return expandCrucibleQueueUntilEnd(newCrucibleQueue, visited, chart, end, stoppingDistance)
 }
 
-fun atEndOfSearch(crucibleQueue:List<Crucible>, end:Position) =
+fun atEndOfSearch(crucibleQueue:PriorityQueue<Crucible>, end:Position) =
     crucibleQueue.isEmpty() || crucibleQueue.first().isAt(end)
 
 fun partTwo(sampleData:List<String>):Int {
-    val chart = sampleData.toChart()
-    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0, 4, 10 )
-    val visited = mutableSetOf<Bearing>()
-    val end = Position(sampleData.first().lastIndex, sampleData.lastIndex)
-    return expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end, 4)
+    return partOne(sampleData, stoppingDistance = 4, maxSteps = 10)
 }
 
 

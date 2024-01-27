@@ -1,5 +1,6 @@
 import io.kotest.core.spec.style.WordSpec
 import io.kotest.matchers.shouldBe
+import java.util.*
 
 class MainTest:WordSpec({
 
@@ -42,9 +43,10 @@ class MainTest:WordSpec({
         "starting at top left, newCrucibleQueue should have crucibles with position (row=1 , col=0) and position(row=0, col=1) " {
             val chart = testdata.toChart()
             val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val priorityQueue = PriorityQueue<Crucible>().apply{add(crucible)}
             val visited = mutableSetOf<Bearing>()
             val end = Position(testdata.first().lastIndex, testdata.lastIndex)
-            expandCrucibleQueue(listOf(crucible), visited, chart) shouldBe listOf(
+            expandCrucibleQueue(priorityQueue, visited, chart).toList() shouldBe listOf(
                 Crucible(Bearing(Position(0,1), Direction.Down, 1),3),
                 Crucible(Bearing(Position(1,0), Direction.Right, 1), 4),
             )
@@ -52,10 +54,11 @@ class MainTest:WordSpec({
         "starting at top left, newCrucibleQueue after two cycles should have crucibles with position (row=1 , col=0) and position(row=0, col=1) " {
             val chart = testdata.toChart()
             val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val priorityQueue = PriorityQueue<Crucible>().apply{add(crucible)}
             val visited = mutableSetOf<Bearing>()
-            val cruciblequeue1 = expandCrucibleQueue(listOf(crucible), visited, chart)
+            val cruciblequeue1 = expandCrucibleQueue(priorityQueue, visited, chart)
             val cruciblequeue2 = expandCrucibleQueue(cruciblequeue1, visited, chart)
-            cruciblequeue2 shouldBe listOf(
+            cruciblequeue2.toList() shouldBe listOf(
                 Crucible(Bearing(position=Position(col=1, row=0), direction=Direction.Right, steps=1), 4),
                 Crucible(Bearing(position=Position(col=1, row=1), direction=Direction.Right, steps=1), 5),
                 Crucible(Bearing(position=Position(col=0, row=2), direction=Direction.Down, steps=2), 6)
@@ -64,9 +67,10 @@ class MainTest:WordSpec({
         "find end of test data" {
             val chart = testdata.toChart()
             val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val priorityQueue = PriorityQueue<Crucible>().apply{add(crucible)}
             val visited = mutableSetOf<Bearing>()
             val end = Position(testdata.first().lastIndex, testdata.lastIndex)
-            expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end) shouldBe 102
+            expandCrucibleQueueUntilEnd(priorityQueue, visited, chart, end) shouldBe 102
         }
 
         "part one with test data" {
