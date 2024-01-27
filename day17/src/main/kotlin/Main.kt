@@ -40,7 +40,7 @@ data class Crucible(val bearing: Bearing, val heatLoss:Int, val stoppingDistance
 
     fun isAt(end:Position) = bearing.position == end && bearing.steps >= stoppingDistance
 
-    override fun compareTo(other: Crucible): Int = heatLoss - other.heatLoss
+    override fun compareTo(other: Crucible) = heatLoss - other.heatLoss
 }
 
 
