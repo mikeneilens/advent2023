@@ -1,6 +1,6 @@
 fun partOne(sampleData:List<String>) :Int {
     val chart = sampleData.toChart()
-    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0 )
+    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0)
     val visited = mutableSetOf<Bearing>()
     val end = Position(sampleData.first().lastIndex, sampleData.lastIndex)
     return expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end)
@@ -8,14 +8,37 @@ fun partOne(sampleData:List<String>) :Int {
 
 typealias Chart = Map<Position, Int>
 
-fun List<String>.toChart() = flatMapIndexed{ row, s -> s.mapIndexed { col, c -> Pair(Position(col,row), c.toString().toInt())  }}.toMap()
+fun List<String>.toChart() = flatMapIndexed{ row, s -> s.mapIndexed { col, c -> Pair(Position(col,row), c.toString().toInt())}}.toMap()
 
-interface CrucibleType {
-    val bearing: Bearing
-    val heatloss:Int
-    fun validDirections(chart:Chart):List<Direction>
-    fun newCrucible(newDirection:Direction, visited:MutableSet<Bearing>, chart:Chart):CrucibleType?
+data class Crucible(val bearing: Bearing, val heatLoss:Int, val stoppingDistance:Int = 0, val maxSteps:Int = 3) {
+
+    fun validDirections(chart:Chart) = Direction.values()
+        .filter{newDirection ->  (newDirection != Direction.None && newDirection.offset != bearing.direction.offset.reversed)
+                && isValid(newDirection)
+                && (newPositionFor(newDirection) in chart) }
+
+    fun isValid(newDirection: Direction) =
+            ((bearing.steps == 0) || (bearing.steps < stoppingDistance && newDirection == bearing.direction)
+                || (bearing.steps in stoppingDistance until maxSteps)
+                || (bearing.steps >= maxSteps && newDirection != bearing.direction))
+
+    fun newCrucible(newDirection:Direction, visited:MutableSet<Bearing>, chart:Chart):Crucible? {
+        val newBearing = Bearing(newPositionFor(newDirection), newDirection, newStepsFor(newDirection))
+        return if (newBearing !in visited) {
+            visited.add(newBearing)
+            Crucible(newBearing, newHeatLossFor(newDirection, chart), stoppingDistance, maxSteps)
+        } else null
+    }
+
+    fun newPositionFor(newDirection: Direction) = bearing.position + newDirection.offset
+
+    fun newStepsFor(newDirection: Direction) = if (newDirection == bearing.direction) bearing.steps + 1 else 1
+
+    fun newHeatLossFor(newDirection:Direction, chart:Chart) = heatLoss + chart.getValue(newPositionFor(newDirection))
+
+    fun isAt(end:Position) = bearing.position == end && bearing.steps >= stoppingDistance
 }
+
 
 data class Bearing(val position: Position, val direction: Direction, val steps:Int)
 
@@ -34,65 +57,30 @@ enum class Direction(val offset:Position) {
     None(Position(row = 0, col = 0)),
 }
 
-data class Crucible(override val bearing: Bearing, override val heatloss:Int):CrucibleType {
-
-    override fun validDirections(chart:Chart) = Direction.values()
-        .filter{(it != Direction.None && it.offset != bearing.direction.offset.reversed)
-                && (bearing.steps < 3 || it != bearing.direction)
-                && (bearing.position + it.offset in chart) }
-
-    override fun newCrucible(newDirection:Direction, visited:MutableSet<Bearing>, chart:Chart):Crucible? {
-        val newPosition = bearing.position + newDirection.offset
-        val newSteps = if (newDirection == bearing.direction) bearing.steps + 1 else 1
-        val newHeatloss = heatloss + chart.getValue(newPosition)
-        val newCrucible = Crucible(Bearing(newPosition, newDirection, newSteps), newHeatloss)
-        return if (newCrucible.bearing !in visited) {
-            visited.add(newCrucible.bearing)
-            newCrucible }
-        else null
-    }
-}
-
-fun expandCrucibleQueue(crucibleQueue:List<CrucibleType>, visited:MutableSet<Bearing>, chart:Chart):List<CrucibleType>  {
+fun expandCrucibleQueue(crucibleQueue:List<Crucible>, visited:MutableSet<Bearing>, chart:Chart):List<Crucible>  {
     val crucible = crucibleQueue.first()
     val newDirections = crucible.validDirections(chart)
     val newCrucibles = newDirections.mapNotNull{ newDirection ->
         crucible.newCrucible(newDirection, visited, chart)
     }
-    return (crucibleQueue.drop(1) + newCrucibles).sortedBy { it.heatloss }
+    return (crucibleQueue.drop(1) + newCrucibles).sortedBy { it.heatLoss }
 }
 
-tailrec fun expandCrucibleQueueUntilEnd(crucibleQueue: List<CrucibleType>, visited:MutableSet<Bearing>, chart:Chart, end:Position, stoppingDistance:Int = 0):Int {
-    if ( crucibleQueue.isEmpty() || end == crucibleQueue.first().bearing.position && crucibleQueue.first().bearing.steps >= stoppingDistance) return crucibleQueue.firstOrNull()?.heatloss ?:0
+tailrec fun expandCrucibleQueueUntilEnd(crucibleQueue: List<Crucible>, visited:MutableSet<Bearing>, chart:Chart, end:Position, stoppingDistance:Int = 0):Int {
+    if ( atEndOfSearch(crucibleQueue, end)) return crucibleQueue.firstOrNull()?.heatLoss ?:0
     val newCrucibleQueue = expandCrucibleQueue(crucibleQueue, visited, chart)
     return expandCrucibleQueueUntilEnd(newCrucibleQueue, visited, chart, end, stoppingDistance)
 }
 
+fun atEndOfSearch(crucibleQueue:List<Crucible>, end:Position) =
+    crucibleQueue.isEmpty() || crucibleQueue.first().isAt(end)
+
 fun partTwo(sampleData:List<String>):Int {
     val chart = sampleData.toChart()
-    val crucible = UltraCrucible(Bearing(Position(0,0), Direction.None, 0), 0 )
+    val crucible = Crucible(Bearing(Position(0,0), Direction.None, 0), 0, 4, 10 )
     val visited = mutableSetOf<Bearing>()
     val end = Position(sampleData.first().lastIndex, sampleData.lastIndex)
     return expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end, 4)
-}
-
-data class UltraCrucible(override val bearing: Bearing, override val heatloss:Int):CrucibleType {
-
-    override fun validDirections(chart:Chart) = Direction.values()
-        .filter{(it != Direction.None && it.offset != bearing.direction.offset.reversed)
-                && ((bearing.steps == 0) || (bearing.steps < 4 && it == bearing.direction) || (bearing.steps in 4..9) || (bearing.steps >= 10 && it != bearing.direction))
-                && (bearing.position + it.offset in chart) }
-
-    override fun newCrucible(newDirection:Direction, visited:MutableSet<Bearing>, chart:Chart):UltraCrucible? {
-        val newPosition = bearing.position + newDirection.offset
-        val newSteps = if (newDirection == bearing.direction) bearing.steps + 1 else 1
-        val newHeatloss = heatloss + chart.getValue(newPosition)
-        val newCrucible = UltraCrucible(Bearing(newPosition, newDirection, newSteps), newHeatloss)
-        return if (newCrucible.bearing !in visited) {
-            visited.add(newCrucible.bearing)
-            newCrucible }
-        else null
-    }
 }
 
 

@@ -73,7 +73,7 @@ class MainTest:WordSpec({
             partOne(testdata) shouldBe 102
         }
         "part one should be 845" {
-//            partOne(sampleData) shouldBe 845
+            partOne(sampleData) shouldBe 845
         }
     })
     "part two" should ({
@@ -87,27 +87,27 @@ class MainTest:WordSpec({
 
         "for an ultra crucible that has travelled 0 steps it can go in any direction" {
             val chart = testdata.toChart()
-            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.None, 0), 0 )
+            val crucible = Crucible(Bearing(Position(5,5), Direction.None, 0), 0,4 , 10)
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Left, Direction.Right, Direction.Up, Direction.Down)
         }
         "for an ultra crucible that has travelled 3 steps it must keep going in the same direction" {
             val chart = testdata.toChart()
-            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 3), 0 )
+            val crucible = Crucible(Bearing(Position(5,5), Direction.Right, 3), 0,4, 10 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right)
         }
         "for an ultra crucible that has travelled 4 steps it can continue in the same direction or turn" {
             val chart = testdata.toChart()
-            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 4), 0 )
+            val crucible = Crucible(Bearing(Position(5,5), Direction.Right, 4), 0, 4, 10 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Up, Direction.Down)
         }
         "for an ultra crucible that has travelled 9 steps it can continue in the same direction or turn" {
             val chart = testdata.toChart()
-            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 9), 0 )
+            val crucible = Crucible(Bearing(Position(5,5), Direction.Right, 9), 0, 4, 10 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Up, Direction.Down)
         }
         "for an ultra crucible that has travelled 10 steps it must turn" {
             val chart = testdata.toChart()
-            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 10), 0 )
+            val crucible = Crucible(Bearing(Position(5,5), Direction.Right, 10), 0, 4, 10 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Up, Direction.Down)
         }
 
@@ -118,7 +118,7 @@ class MainTest:WordSpec({
             partTwo(testdata2) shouldBe 71
         }
 
-        "part two should be 0" {
+        "part two should be 993" {
             partTwo(sampleData) shouldBe 993
         }
     })
