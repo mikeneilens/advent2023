@@ -26,63 +26,100 @@ class MainTest:WordSpec({
         }
         "if crucible direction is Right and steps < 3 valid new directions are Up ,Down, Right" {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(1,1), Direction.Right, 2 )
+            val crucible = Crucible(Bearing(Position(1,1), Direction.Right, 2), 0 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Up, Direction.Down)
         }
         "if crucible direction is Right and steps = 3 valid new directions are Up ,Down" {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(1,1), Direction.Right, 3 )
+            val crucible = Crucible(Bearing(Position(1,1), Direction.Right, 3), 0 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Up, Direction.Down)
         }
         "if crucible direction is Right and steps < 3 and current position in top left corner valid new directions are Down, Right" {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(0,0), Direction.Right, 2 )
+            val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 2), 0 )
             crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Down)
         }
         "starting at top left, newCrucibleQueue should have crucibles with position (row=1 , col=0) and position(row=0, col=1) " {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(0,0), Direction.Right, 0 )
-            val heatLoss = mutableMapOf<Crucible, Int>()
-            expandCrucibleQueue(listOf(crucible), heatLoss, chart) shouldBe listOf(
-                Crucible(Position(0,1), Direction.Down, 1),
-                Crucible(Position(1,0), Direction.Right, 1),
+            val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val visited = mutableSetOf<Bearing>()
+            val end = Position(testdata.first().lastIndex, testdata.lastIndex)
+            expandCrucibleQueue(listOf(crucible), visited, chart) shouldBe listOf(
+                Crucible(Bearing(Position(0,1), Direction.Down, 1),3),
+                Crucible(Bearing(Position(1,0), Direction.Right, 1), 4),
             )
-            heatLoss.minHeatLoss(Position(0,1)) shouldBe 3
-            heatLoss.minHeatLoss(Position(1,0)) shouldBe 4
         }
         "starting at top left, newCrucibleQueue after two cycles should have crucibles with position (row=1 , col=0) and position(row=0, col=1) " {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(0,0), Direction.Right, 0 )
-            val heatLoss = mutableMapOf<Crucible, Int>()
-            val cruciblequeue1 = expandCrucibleQueue(listOf(crucible), heatLoss, chart)
-            val cruciblequeue2 = expandCrucibleQueue(cruciblequeue1, heatLoss, chart)
+            val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val visited = mutableSetOf<Bearing>()
+            val cruciblequeue1 = expandCrucibleQueue(listOf(crucible), visited, chart)
+            val cruciblequeue2 = expandCrucibleQueue(cruciblequeue1, visited, chart)
             cruciblequeue2 shouldBe listOf(
-                Crucible(position=Position(col=1, row=0), direction=Direction.Right, steps=1),
-                Crucible(position=Position(col=1, row=1), direction=Direction.Right, steps=1),
-                Crucible(position=Position(col=0, row=2), direction=Direction.Down, steps=2)
+                Crucible(Bearing(position=Position(col=1, row=0), direction=Direction.Right, steps=1), 4),
+                Crucible(Bearing(position=Position(col=1, row=1), direction=Direction.Right, steps=1), 5),
+                Crucible(Bearing(position=Position(col=0, row=2), direction=Direction.Down, steps=2), 6)
             )
-            heatLoss.minHeatLoss(Position(col=1, row=0)) shouldBe 4
-            heatLoss.minHeatLoss(Position(col=1, row=1)) shouldBe 5
-            heatLoss.minHeatLoss(Position(col=0, row=2)) shouldBe 6
         }
         "find end of test data" {
             val chart = testdata.toChart()
-            val crucible = Crucible(Position(0,0), Direction.Right, 0 )
-            val heatLoss = mutableMapOf<Crucible, Int>()
+            val crucible = Crucible(Bearing(Position(0,0), Direction.Right, 0), 0 )
+            val visited = mutableSetOf<Bearing>()
             val end = Position(testdata.first().lastIndex, testdata.lastIndex)
-            expandCrucibleQueueUntilEnd(listOf(crucible), heatLoss, chart, end) shouldBe 102
+            expandCrucibleQueueUntilEnd(listOf(crucible), visited, chart, end) shouldBe 102
         }
 
         "part one with test data" {
             partOne(testdata) shouldBe 102
         }
-        "part one should be 0" {
+        "part one should be 845" {
 //            partOne(sampleData) shouldBe 845
         }
     })
     "part two" should ({
+        val testdata2 = """
+            111111111111
+            999999999991
+            999999999991
+            999999999991
+            999999999991
+        """.trimIndent().split("\n")
+
+        "for an ultra crucible that has travelled 0 steps it can go in any direction" {
+            val chart = testdata.toChart()
+            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.None, 0), 0 )
+            crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Left, Direction.Right, Direction.Up, Direction.Down)
+        }
+        "for an ultra crucible that has travelled 3 steps it must keep going in the same direction" {
+            val chart = testdata.toChart()
+            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 3), 0 )
+            crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right)
+        }
+        "for an ultra crucible that has travelled 4 steps it can continue in the same direction or turn" {
+            val chart = testdata.toChart()
+            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 4), 0 )
+            crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Up, Direction.Down)
+        }
+        "for an ultra crucible that has travelled 9 steps it can continue in the same direction or turn" {
+            val chart = testdata.toChart()
+            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 9), 0 )
+            crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Right, Direction.Up, Direction.Down)
+        }
+        "for an ultra crucible that has travelled 10 steps it must turn" {
+            val chart = testdata.toChart()
+            val crucible = UltraCrucible(Bearing(Position(5,5), Direction.Right, 10), 0 )
+            crucible.validDirections(chart).toSet() shouldBe setOf(Direction.Up, Direction.Down)
+        }
+
+        "part two with test data" {
+            partTwo(testdata) shouldBe 94
+        }
+        "part two with test data2" {
+            partTwo(testdata2) shouldBe 71
+        }
+
         "part two should be 0" {
-            partTwo(sampleData) shouldBe 0
+            partTwo(sampleData) shouldBe 993
         }
     })
 })
