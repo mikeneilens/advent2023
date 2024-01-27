@@ -63,10 +63,8 @@ enum class Direction(val offset:Position) {
 
 fun expandCrucibleQueue(crucibleQueue:PriorityQueue<Crucible>, visited:MutableSet<Bearing>, chart:Chart):PriorityQueue<Crucible>  {
     val crucible = crucibleQueue.remove()
-    val newDirections = crucible.validDirections(chart)
-    newDirections.mapNotNull{ newDirection ->
-        crucible.newCrucible(newDirection, visited, chart)
-    }.forEach { crucibleQueue.add(it) }
+    crucible.validDirections(chart).mapNotNull{ newDirection -> crucible.newCrucible(newDirection, visited, chart) }
+        .forEach { crucibleQueue.add(it) }
     return crucibleQueue
 }
 
